@@ -26,8 +26,8 @@ import type {
   UserRole,
   UserStatus,
   UserWithTempPassword,
-} from "@noteshare/shared";
-import { LIMITS } from "@noteshare/shared";
+} from "@cinco-wiki/shared";
+import { LIMITS } from "@cinco-wiki/shared";
 import { api, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { fullName } from "@/lib/format";

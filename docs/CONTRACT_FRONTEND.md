@@ -1,6 +1,6 @@
 # Contrat frontend — composants & routes
 
-> Types : `@noteshare/shared`. Client API : `@/lib/api` (objet `api`, `ApiClientError`,
+> Types : `@cinco-wiki/shared`. Client API : `@/lib/api` (objet `api`, `ApiClientError`,
 > `tokenStore`). Auth : `@/lib/auth-context` (`useAuth()` → `{user, loading, login,
 > logout, refreshUser, isAdmin}`). Utils : `@/lib/format` (`relativeDate`, `fullName`,
 > `initials`, `roundHalf`), `@/lib/cn` (`cn`). Données : **SWR** (`useSWR`).

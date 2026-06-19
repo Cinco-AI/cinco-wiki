@@ -3,7 +3,7 @@
 import { useId, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import { Hash, X } from "lucide-react";
-import { LIMITS, normalizeTag, type Tag } from "@noteshare/shared";
+import { LIMITS, normalizeTag, type Tag } from "@cinco-wiki/shared";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 

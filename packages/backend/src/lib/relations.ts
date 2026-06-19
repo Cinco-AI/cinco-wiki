@@ -1,5 +1,5 @@
 import { ObjectId, type Db } from "mongodb";
-import type { UserPublic } from "@noteshare/shared";
+import type { UserPublic } from "@cinco-wiki/shared";
 import { collections } from "./db.js";
 import { DELETED_USER, toUserPublic } from "../models/index.js";
 

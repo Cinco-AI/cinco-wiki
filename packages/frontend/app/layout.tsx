@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
-  title: "NoteShare",
+  title: "Cinco Wiki",
   description: "Application collaborative de prise de notes",
 };
 

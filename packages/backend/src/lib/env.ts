@@ -11,7 +11,7 @@ export const env = {
     return required("MONGODB_URI");
   },
   get dbName() {
-    return process.env.MONGODB_DB ?? "noteshare";
+    return process.env.MONGODB_DB ?? "cinco-wiki";
   },
   get jwtSecret() {
     return required("JWT_SECRET");

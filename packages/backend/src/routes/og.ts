@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import * as cheerio from "cheerio";
 import { z } from "zod";
-import type { LinkPreview } from "@noteshare/shared";
+import type { LinkPreview } from "@cinco-wiki/shared";
 import { type AppEnv } from "../lib/http.js";
 
 export const ogRoutes = new Hono<AppEnv>();
@@ -17,7 +17,7 @@ ogRoutes.get("/", async (c) => {
 const FETCH_TIMEOUT_MS = 5000;
 const MAX_HTML_BYTES = 512 * 1024; // on ne parse que le début du document.
 const USER_AGENT =
-  "Mozilla/5.0 (compatible; NoteShareBot/1.0; +https://noteshare.app)";
+  "Mozilla/5.0 (compatible; CincoWikiBot/1.0; +https://cinco.ai)";
 
 /** hostname d'une URL, ou null si non parsable. */
 function safeDomain(url: string): string | null {

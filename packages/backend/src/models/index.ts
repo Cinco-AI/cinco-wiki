@@ -6,8 +6,8 @@ import type {
   UserAdmin,
   UserPublic,
   UserSelf,
-} from "@noteshare/shared";
-import { buildExcerpt } from "@noteshare/shared";
+} from "@cinco-wiki/shared";
+import { buildExcerpt } from "@cinco-wiki/shared";
 import type {
   CommentDoc,
   NoteDoc,

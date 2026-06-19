@@ -1,14 +1,14 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
 /**
- * NoteShare — backend SST v3 (Ion). Région eu-west-3 (Paris).
+ * Cinco Wiki — backend SST v3 (Ion). Région eu-west-3 (Paris).
  * Le frontend Next.js est déployé séparément sur Netlify : SST ne gère
  * ici que l'API (API Gateway + Lambda) et le stockage S3 des images.
  */
 export default $config({
   app(input) {
     return {
-      name: "noteshare",
+      name: "cinco-wiki",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage ?? ""),
       home: "aws",
@@ -18,7 +18,7 @@ export default $config({
   async run() {
     // Secrets : `sst secret set MongoUri "..."` etc.
     const mongoUri = new sst.Secret("MongoUri");
-    const mongoDb = new sst.Secret("MongoDb", "noteshare");
+    const mongoDb = new sst.Secret("MongoDb", "cinco-wiki");
     const jwtSecret = new sst.Secret("JwtSecret");
     const corsOrigins = new sst.Secret("CorsOrigins", "*");
     const bucketName = new sst.Secret("BucketName");

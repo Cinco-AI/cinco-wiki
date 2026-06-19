@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { LoginInput, UserSelf } from "@noteshare/shared";
+import type { LoginInput, UserSelf } from "@cinco-wiki/shared";
 import { api, tokenStore } from "./api";
 
 interface AuthState {

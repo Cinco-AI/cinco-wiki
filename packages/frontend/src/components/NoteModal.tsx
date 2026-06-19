@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { Check, ExternalLink, Pencil, Share2, X } from "lucide-react";
-import type { Note } from "@noteshare/shared";
+import type { Note } from "@cinco-wiki/shared";
 import { Avatar } from "@/components/Avatar";
 import { TagBadge } from "@/components/TagBadge";
 import { Modal } from "@/components/Modal";

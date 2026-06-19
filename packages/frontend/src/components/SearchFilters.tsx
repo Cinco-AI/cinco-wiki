@@ -15,7 +15,7 @@ import {
   type NoteSort,
   type Tag,
   type UserPublic,
-} from "@noteshare/shared";
+} from "@cinco-wiki/shared";
 import { TagBadge } from "@/components/TagBadge";
 import { fullName } from "@/lib/format";
 import { cn } from "@/lib/cn";

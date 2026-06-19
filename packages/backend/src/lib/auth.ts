@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
-import type { UserRole } from "@noteshare/shared";
-import { LIMITS } from "@noteshare/shared";
+import type { UserRole } from "@cinco-wiki/shared";
+import { LIMITS } from "@cinco-wiki/shared";
 import { env } from "./env.js";
 
 const ACCESS_TTL = "15m";

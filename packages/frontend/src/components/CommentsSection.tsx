@@ -3,8 +3,8 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { Loader2, MessageSquare, Pencil, Send, Trash2 } from "lucide-react";
-import type { Comment } from "@noteshare/shared";
-import { LIMITS } from "@noteshare/shared";
+import type { Comment } from "@cinco-wiki/shared";
+import { LIMITS } from "@cinco-wiki/shared";
 import { api, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { relativeDate, fullName } from "@/lib/format";

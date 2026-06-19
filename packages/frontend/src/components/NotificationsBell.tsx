@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { Bell, Check, CheckCheck } from "lucide-react";
-import type { Notification } from "@noteshare/shared";
+import type { Notification } from "@cinco-wiki/shared";
 import { api } from "@/lib/api";
 import { relativeDate } from "@/lib/format";
 import { cn } from "@/lib/cn";

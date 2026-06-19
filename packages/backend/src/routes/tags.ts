@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import type { Db } from "mongodb";
 import { z } from "zod";
-import type { Tag } from "@noteshare/shared";
-import { normalizeTag } from "@noteshare/shared";
+import type { Tag } from "@cinco-wiki/shared";
+import { normalizeTag } from "@cinco-wiki/shared";
 import { collections } from "../lib/db.js";
 import { body, errors, requireAdmin, type AppEnv } from "../lib/http.js";
 

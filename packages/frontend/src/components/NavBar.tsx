@@ -71,7 +71,7 @@ export function NavBar() {
           href="/"
           className="shrink-0 rounded-lg text-xl font-bold text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
         >
-          Note<span className="text-brand-600">Share</span>
+          Cinco <span className="text-brand-600">Wiki</span>
         </Link>
 
         {/* Recherche globale (desktop) */}

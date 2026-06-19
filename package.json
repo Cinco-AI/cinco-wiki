@@ -1,8 +1,8 @@
 {
-  "name": "noteshare",
+  "name": "cinco-wiki",
   "version": "1.0.0",
   "private": true,
-  "description": "NoteShare — application collaborative de prise de notes",
+  "description": "Cinco Wiki — application collaborative de prise de notes",
   "workspaces": [
     "packages/shared",
     "packages/backend",
@@ -13,7 +13,8 @@
     "deploy": "sst deploy --stage production",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build:shared": "npm run build --workspace packages/shared",
-    "frontend": "npm run dev --workspace packages/frontend"
+    "frontend": "npm run dev --workspace packages/frontend",
+    "seed:admin": "node scripts/seed-admin.mjs"
   },
   "devDependencies": {
     "sst": "^3.3.0",

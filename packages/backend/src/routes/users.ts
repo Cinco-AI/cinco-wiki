@@ -165,7 +165,7 @@ usersRoutes.post("/", requireAdmin, async (c) => {
     db,
     doc._id,
     "account_created",
-    "Votre compte NoteShare a été créé.",
+    "Votre compte Cinco Wiki a été créé.",
   );
 
   return c.json({ user: toUserAdmin(doc), temporaryPassword });

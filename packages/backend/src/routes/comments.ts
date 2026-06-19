@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
-import type { UserRole } from "@noteshare/shared";
-import { LIMITS } from "@noteshare/shared";
+import type { UserRole } from "@cinco-wiki/shared";
+import { LIMITS } from "@cinco-wiki/shared";
 import { collections, type CommentDoc, type NoteDoc } from "../lib/db.js";
 import {
   body,

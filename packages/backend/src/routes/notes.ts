@@ -7,8 +7,8 @@ import type {
   NoteCard,
   NoteSort,
   Paginated,
-} from "@noteshare/shared";
-import { LIMITS, normalizeTag } from "@noteshare/shared";
+} from "@cinco-wiki/shared";
+import { LIMITS, normalizeTag } from "@cinco-wiki/shared";
 import { collections, type NoteDoc } from "../lib/db.js";
 import { body, errors, oid, type AppEnv } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";

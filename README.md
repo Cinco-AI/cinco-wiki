@@ -1,7 +1,7 @@
-# NoteShare
+# Cinco Wiki
 
 Application web collaborative de prise de notes — espace commun, notes en rich-text,
-votes (étoiles), commentaires, tags, recherche full-text. Cf. `NoteShare_Spec_Fonctionnelle.md`.
+votes (étoiles), commentaires, tags, recherche full-text. Cf. `Cinco_Wiki_Spec_Fonctionnelle.md`.
 
 ## Architecture
 
@@ -44,9 +44,9 @@ Définir les secrets une fois par stage :
 
 ```bash
 npx sst secret set MongoUri "mongodb+srv://..."
-npx sst secret set MongoDb "noteshare"
+npx sst secret set MongoDb "cinco-wiki"
 npx sst secret set JwtSecret "$(openssl rand -hex 32)"
-npx sst secret set BucketName "noteshare-uploads-dev"
+npx sst secret set BucketName "cinco-wiki-uploads-dev"
 npx sst secret set CorsOrigins "http://localhost:3000"
 ```
 
@@ -75,9 +75,21 @@ Déploiement Netlify : base `packages/frontend`, plugin `@netlify/plugin-nextjs`
 
 ## Amorçage du premier admin
 
-Aucune inscription publique (§3.1). Créer le premier administrateur directement
-en base (collection `users`) avec `role:"admin"`, `status:"active"`, `tokenVersion:0`
-et un `passwordHash` bcrypt, puis se connecter et gérer les comptes via `/admin/utilisateurs`.
+Aucune inscription publique (§3.1). Le script `scripts/seed-admin.mjs` crée (ou
+promeut) le premier administrateur directement en base — `role:"admin"`,
+`status:"active"`, `tokenVersion:0`, `passwordHash` bcrypt (coût 10, identique au
+backend). Idempotent (clé unique sur `email`).
+
+```bash
+# MONGODB_URI requis ; MONGODB_DB défaut "cinco-wiki" ; email défaut jonathan@cinco.ai
+MONGODB_URI="mongodb+srv://user:pass@cluster/..." npm run seed:admin
+```
+
+Variables : `SEED_ADMIN_EMAIL`, `SEED_ADMIN_FIRSTNAME`, `SEED_ADMIN_LASTNAME`,
+`SEED_ADMIN_PASSWORD` (sinon un mot de passe fort est généré et affiché une fois).
+Drapeaux : `--email --first --last --password --reset-password`. Un `.env` à la
+racine est chargé s'il existe. Puis se connecter et gérer les comptes via
+`/admin/utilisateurs`.
 
 ## Qualité
 

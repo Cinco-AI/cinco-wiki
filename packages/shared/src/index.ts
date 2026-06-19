@@ -1,5 +1,5 @@
 /**
- * @noteshare/shared — contrat d'API partagé entre le backend (Lambda) et le
+ * @cinco-wiki/shared — contrat d'API partagé entre le backend (Lambda) et le
  * frontend (Next.js). Source de vérité unique pour les DTO et les règles.
  */
 

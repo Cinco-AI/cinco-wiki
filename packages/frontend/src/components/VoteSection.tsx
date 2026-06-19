@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import type { Note } from "@noteshare/shared";
+import type { Note } from "@cinco-wiki/shared";
 import { Stars } from "@/components/Stars";
 import { api, ApiClientError } from "@/lib/api";
 

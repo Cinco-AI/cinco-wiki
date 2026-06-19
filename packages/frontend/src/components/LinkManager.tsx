@@ -10,7 +10,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { LIMITS, type LinkPreview } from "@noteshare/shared";
+import { LIMITS, type LinkPreview } from "@cinco-wiki/shared";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 

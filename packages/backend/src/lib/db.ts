@@ -6,7 +6,7 @@ import type {
   NotificationType,
   UserRole,
   UserStatus,
-} from "@noteshare/shared";
+} from "@cinco-wiki/shared";
 import { env } from "./env.js";
 
 // ---------------------------------------------------------------------------

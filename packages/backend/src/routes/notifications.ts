@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { ObjectId, type Db } from "mongodb";
-import type { NotificationType } from "@noteshare/shared";
+import type { NotificationType } from "@cinco-wiki/shared";
 import { collections, type NotificationDoc } from "../lib/db.js";
 import { errors, oid, type AppEnv } from "../lib/http.js";
 import { toNotification } from "../models/index.js";

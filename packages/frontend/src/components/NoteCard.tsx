@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Link2, MessageCircle, Pencil } from "lucide-react";
-import type { NoteCard as NoteCardModel } from "@noteshare/shared";
+import type { NoteCard as NoteCardModel } from "@cinco-wiki/shared";
 import { Avatar } from "@/components/Avatar";
 import { Stars } from "@/components/Stars";
 import { TagBadge } from "@/components/TagBadge";

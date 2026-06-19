@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { Loader2 } from "lucide-react";
-import type { NoteCard as NoteCardDto, NoteQuery, UserPublic } from "@noteshare/shared";
+import type { NoteCard as NoteCardDto, NoteQuery, UserPublic } from "@cinco-wiki/shared";
 import { api } from "@/lib/api";
 import { NoteCard } from "@/components/NoteCard";
 import { SearchFilters } from "@/components/SearchFilters";

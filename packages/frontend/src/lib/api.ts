@@ -25,10 +25,10 @@ import type {
   UserSelf,
   UserWithTempPassword,
   VoteInput,
-} from "@noteshare/shared";
+} from "@cinco-wiki/shared";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-const REFRESH_KEY = "noteshare.refresh";
+const REFRESH_KEY = "cinco-wiki.refresh";
 
 export class ApiClientError extends Error {
   constructor(
@@ -198,7 +198,7 @@ export const api = {
   presignUpload: (input: PresignUploadInput) =>
     request<PresignUploadResult>("/uploads/presign", { method: "POST", body: input }),
   fetchOg: (url: string) =>
-    request<import("@noteshare/shared").LinkPreview>("/og", { query: { url } }),
+    request<import("@cinco-wiki/shared").LinkPreview>("/og", { query: { url } }),
 
   // --- Users (admin) ---
   listUsers: (q?: string) =>

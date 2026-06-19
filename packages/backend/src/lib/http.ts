@@ -1,7 +1,7 @@
 import type { Context, MiddlewareHandler } from "hono";
 import { ObjectId, type Db } from "mongodb";
 import { ZodError, type ZodSchema } from "zod";
-import type { UserRole } from "@noteshare/shared";
+import type { UserRole } from "@cinco-wiki/shared";
 import { getDb, collections, type UserDoc } from "./db.js";
 import { verifyAccessToken } from "./auth.js";
 

@@ -10,7 +10,7 @@ import {
   type NoteImage,
   type NoteInput,
   type NoteStatus,
-} from "@noteshare/shared";
+} from "@cinco-wiki/shared";
 import { api, ApiClientError } from "@/lib/api";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { LinkManager } from "@/components/LinkManager";

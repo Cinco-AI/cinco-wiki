@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   // Le package partagé est en TS brut : Next doit le transpiler.
-  transpilePackages: ["@noteshare/shared"],
+  transpilePackages: ["@cinco-wiki/shared"],
   images: {
     // Images servies depuis S3 (eu-west-3) — domaine ajusté au déploiement.
     remotePatterns: [

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { IMAGE_MIME, LIMITS, type PresignUploadResult } from "@noteshare/shared";
+import { IMAGE_MIME, LIMITS, type PresignUploadResult } from "@cinco-wiki/shared";
 import { body, errors, type AppEnv } from "../lib/http.js";
 import { env } from "../lib/env.js";
 

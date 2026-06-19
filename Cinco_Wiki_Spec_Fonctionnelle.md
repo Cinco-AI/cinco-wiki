@@ -1,4 +1,4 @@
-# NoteShare — Spécification Fonctionnelle
+# Cinco Wiki — Spécification Fonctionnelle
 
 **Application collaborative de prise de notes**
 Version 1.0 — Juin 2026
@@ -39,7 +39,7 @@ Version 1.0 — Juin 2026
 
 ## 1. Introduction et Objectifs
 
-NoteShare est une application web collaborative permettant à une communauté d'utilisateurs gérés par un administrateur de créer, enrichir, organiser et commenter des notes partagées. Elle s'inspire de l'ergonomie de Google Keep tout en ajoutant une dimension sociale (votes, commentaires) et un éditeur de contenu riche.
+Cinco Wiki est une application web collaborative permettant à une communauté d'utilisateurs gérés par un administrateur de créer, enrichir, organiser et commenter des notes partagées. Elle s'inspire de l'ergonomie de Google Keep tout en ajoutant une dimension sociale (votes, commentaires) et un éditeur de contenu riche.
 
 ### Objectifs principaux
 

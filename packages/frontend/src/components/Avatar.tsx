@@ -1,4 +1,4 @@
-import type { UserPublic } from "@noteshare/shared";
+import type { UserPublic } from "@cinco-wiki/shared";
 import { fullName, initials } from "@/lib/format";
 import { cn } from "@/lib/cn";
 

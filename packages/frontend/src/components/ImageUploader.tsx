@@ -10,7 +10,7 @@ import {
   UploadCloud,
   X,
 } from "lucide-react";
-import { IMAGE_MIME, LIMITS, type NoteImage } from "@noteshare/shared";
+import { IMAGE_MIME, LIMITS, type NoteImage } from "@cinco-wiki/shared";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 

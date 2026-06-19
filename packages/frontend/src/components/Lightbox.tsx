@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import type { NoteImage } from "@noteshare/shared";
+import type { NoteImage } from "@cinco-wiki/shared";
 
 interface LightboxProps {
   images: NoteImage[];

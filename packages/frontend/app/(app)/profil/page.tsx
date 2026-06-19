@@ -9,7 +9,7 @@ import {
   Star,
   UserRound,
 } from "lucide-react";
-import type { NoteImage } from "@noteshare/shared";
+import type { NoteImage } from "@cinco-wiki/shared";
 import { api, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { fullName } from "@/lib/format";
