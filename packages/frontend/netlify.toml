@@ -1,0 +1,11 @@
+# Déploiement frontend Next.js sur Netlify.
+# Base = packages/frontend ; le plugin Next gère le build & les fonctions edge.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"

@@ -1,0 +1,23 @@
+{
+  "name": "noteshare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NoteShare — application collaborative de prise de notes",
+  "workspaces": [
+    "packages/shared",
+    "packages/backend",
+    "packages/frontend"
+  ],
+  "scripts": {
+    "dev": "sst dev",
+    "deploy": "sst deploy --stage production",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build:shared": "npm run build --workspace packages/shared",
+    "frontend": "npm run dev --workspace packages/frontend"
+  },
+  "devDependencies": {
+    "sst": "^3.3.0",
+    "typescript": "^5.6.3"
+  },
+  "packageManager": "npm@11.6.2"
+}
