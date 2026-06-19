@@ -44,7 +44,9 @@ Définir les secrets une fois par stage :
 
 ```bash
 npx sst secret set MongoUri "mongodb+srv://..."
+npx sst secret set MongoDb "noteshare"
 npx sst secret set JwtSecret "$(openssl rand -hex 32)"
+npx sst secret set BucketName "noteshare-uploads-dev"
 npx sst secret set CorsOrigins "http://localhost:3000"
 ```
 

@@ -18,11 +18,20 @@ export default $config({
   async run() {
     // Secrets : `sst secret set MongoUri "..."` etc.
     const mongoUri = new sst.Secret("MongoUri");
+    const mongoDb = new sst.Secret("MongoDb", "noteshare");
     const jwtSecret = new sst.Secret("JwtSecret");
     const corsOrigins = new sst.Secret("CorsOrigins", "*");
+    const bucketName = new sst.Secret("BucketName");
 
     // Bucket images — lecture publique (URLs servies dans les cards/modals).
-    const bucket = new sst.aws.Bucket("Uploads", { access: "public" });
+    const bucket = new sst.aws.Bucket("Uploads", {
+      access: "public",
+      transform: {
+        bucket: (args) => {
+          args.bucket = bucketName.value;
+        },
+      },
+    });
 
     const api = new sst.aws.ApiGatewayV2("Api", {
       cors: false, // CORS géré dans Hono
@@ -37,7 +46,7 @@ export default $config({
       link: [bucket],
       environment: {
         MONGODB_URI: mongoUri.value,
-        MONGODB_DB: "noteshare",
+        MONGODB_DB: mongoDb.value,
         JWT_SECRET: jwtSecret.value,
         BUCKET_NAME: bucket.name,
         CORS_ORIGINS: corsOrigins.value,

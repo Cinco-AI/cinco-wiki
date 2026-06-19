@@ -28,3 +28,6 @@ npm-debug.log*
 
 # netlify
 .netlify/
+
+# scripts de dev locaux (valeurs fictives / secrets)
+/scripts/dev-*.sh
