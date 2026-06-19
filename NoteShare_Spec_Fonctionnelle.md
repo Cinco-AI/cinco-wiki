@@ -71,7 +71,7 @@ L'accès à l'application est conditionné à une authentification. Aucune inscr
 
 - Champs : adresse e-mail + mot de passe
 - Option « Se souvenir de moi » (session persistante 30 jours)
-- L'admin peut réinitialiser le mot de passe de l'utilisateur
+- Aucune fonctionnalité de réinitialisation de mot de passe en libre-service — l'admin réinitialise directement depuis le panneau d'administration
 - Message d'erreur générique en cas d'identifiants incorrects (sans préciser lequel est faux)
 - Redirection automatique vers le tableau de bord après connexion réussie
 
@@ -81,8 +81,8 @@ L'administrateur dispose d'un panneau dédié pour gérer l'ensemble des utilisa
 
 | Action | Détails |
 |---|---|
-| Créer un utilisateur | Formulaire : prénom, nom, e-mail, rôle (Utilisateur / Admin), mot de passe temporaire |
-| Modifier un utilisateur | Mettre à jour le profil, réinitialiser le mot de passe, changer le rôle |
+| Créer un utilisateur | Formulaire : prénom, nom, e-mail, rôle (Utilisateur / Admin), mot de passe temporaire — affiché une seule fois à l'admin pour transmission manuelle |
+| Modifier un utilisateur | Mettre à jour le profil, réinitialiser le mot de passe (nouveau mot de passe affiché à l'admin), changer le rôle |
 | Désactiver un compte | Le compte est suspendu, l'utilisateur ne peut plus se connecter (les notes sont conservées) |
 | Supprimer un compte | Suppression définitive avec confirmation — les notes sont conservées et assignées à « Utilisateur supprimé » |
 | Lister les utilisateurs | Tableau paginé avec recherche par nom/e-mail, statut actif/inactif, date de création |
@@ -383,15 +383,15 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 
 | Couche | Technologie suggérée | Justification |
 |---|---|---|
-| Frontend | React + TypeScript | Écosystème mature, composants réutilisables, typage fort |
-| Éditeur rich text | TipTap (basé sur ProseMirror) | Extensible, open-source, bonne intégration React |
+| Frontend | Next.js + TypeScript | SSR/SSG natif, routing App Router, composants serveur, typage fort |
+| Éditeur rich text | TipTap (basé sur ProseMirror) | Extensible, open-source, bonne intégration React/Next.js |
 | Styles | Tailwind CSS | Productivité, responsive natif, design system cohérent |
-| Backend | Node.js / Express ou NestJS | API REST ou GraphQL, écosystème JS unifié |
-| Base de données | PostgreSQL | Full-text search natif (tsvector), relationnel robuste |
-| Stockage fichiers | AWS S3 ou équivalent | Stockage d'images scalable et fiable |
-| Authentification | JWT + refresh tokens | Stateless, sécurisé, compatible avec les clients SPA |
-| Recherche full-text | PostgreSQL FTS ou Elasticsearch | FTS PostgreSQL suffisant pour un premier MVP |
-| Preview liens | API microlink.io ou service maison | Extraction Open Graph depuis les URLs |
+| Backend | AWS Lambda + API Gateway | Serverless, scalabilité automatique, coût à l'usage |
+| Base de données | MongoDB Atlas | Documents flexibles, Atlas Search pour le full-text, scalabilité managée |
+| Stockage fichiers | AWS S3 | Stockage d'images scalable, intégration native avec Lambda |
+| Authentification | JWT + refresh tokens | Stateless, sécurisé, compatible avec Next.js et Lambda |
+| Recherche full-text | MongoDB Atlas Search | Full-text search intégré, pas d'infrastructure supplémentaire |
+| Preview liens | API microlink.io ou service maison (Lambda) | Extraction Open Graph depuis les URLs |
 
 ---
 
