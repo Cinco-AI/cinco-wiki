@@ -377,21 +377,32 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 
 ---
 
-## 14. Stack Technique Recommandée
+## 14. Stack Technique
 
-> Ces recommandations sont données à titre indicatif et pourront être adaptées selon les contraintes du projet.
-
-| Couche | Technologie suggérée | Justification |
+| Couche | Technologie | Détail |
 |---|---|---|
-| Frontend | Next.js + TypeScript | SSR/SSG natif, routing App Router, composants serveur, typage fort |
+| Frontend | Next.js + TypeScript | Hébergé sur **Netlify** (pure frontend, pas d'API Routes backend) |
 | Éditeur rich text | TipTap (basé sur ProseMirror) | Extensible, open-source, bonne intégration React/Next.js |
 | Styles | Tailwind CSS | Productivité, responsive natif, design system cohérent |
-| Backend | AWS Lambda + API Gateway | Serverless, scalabilité automatique, coût à l'usage |
-| Base de données | MongoDB Atlas | Documents flexibles, Atlas Search pour le full-text, scalabilité managée |
-| Stockage fichiers | AWS S3 | Stockage d'images scalable, intégration native avec Lambda |
-| Authentification | JWT + refresh tokens | Stateless, sécurisé, compatible avec Next.js et Lambda |
-| Recherche full-text | MongoDB Atlas Search | Full-text search intégré, pas d'infrastructure supplémentaire |
-| Preview liens | API microlink.io ou service maison (Lambda) | Extraction Open Graph depuis les URLs |
+| Backend | AWS Lambda + API Gateway | Déployé via **SST v3 (Ion)**, région **eu-west-3 (Paris)** |
+| Infrastructure as code | SST v3 (Ion) | TypeScript-first, Live Lambda pour le dev local, déploiement `sst deploy` |
+| Base de données | MongoDB Atlas | Cluster **existant** — Atlas Search pour le full-text |
+| Stockage fichiers | AWS S3 | Bucket en **eu-west-3**, intégration native Lambda |
+| Authentification | JWT + refresh tokens | Stateless, sécurisé, compatible Netlify + Lambda séparés |
+| Recherche full-text | MongoDB Atlas Search | Intégré à Atlas, pas d'infrastructure supplémentaire |
+| Preview liens | Lambda dédié (scraping OG) | Extraction Open Graph depuis les URLs |
+
+### Architecture de déploiement
+
+```
+Netlify                     AWS (eu-west-3)
+┌─────────────┐             ┌──────────────────────────────┐
+│  Next.js    │  REST API   │  API Gateway                 │
+│  (frontend) │ ──────────► │    └── AWS Lambda (SST)      │
+│             │             │          └── MongoDB Atlas    │
+└─────────────┘             │          └── S3 (images)     │
+                            └──────────────────────────────┘
+```
 
 ---
 
