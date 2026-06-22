@@ -9,15 +9,21 @@
     "packages/frontend"
   ],
   "scripts": {
-    "dev": "sst dev",
-    "deploy": "sst deploy --stage production",
+    "dev": "serverless offline --stage dev",
+    "deploy": "serverless deploy --stage production",
+    "deploy:dev": "serverless deploy --stage dev",
+    "remove": "serverless remove --stage production",
+    "secrets:set": "./scripts/set-secrets.sh",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build:shared": "npm run build --workspace packages/shared",
     "frontend": "npm run dev --workspace packages/frontend",
     "seed:admin": "node scripts/seed-admin.mjs"
   },
   "devDependencies": {
-    "sst": "^3.3.0",
+    "esbuild": "^0.24.2",
+    "serverless": "^3.40.0",
+    "serverless-esbuild": "^1.55.0",
+    "serverless-offline": "^13.9.0",
     "typescript": "^5.6.3"
   },
   "packageManager": "npm@11.6.2"

@@ -384,8 +384,8 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 | Frontend | Next.js + TypeScript | Hébergé sur **Netlify** (pure frontend, pas d'API Routes backend) |
 | Éditeur rich text | TipTap (basé sur ProseMirror) | Extensible, open-source, bonne intégration React/Next.js |
 | Styles | Tailwind CSS | Productivité, responsive natif, design system cohérent |
-| Backend | AWS Lambda + API Gateway | Déployé via **SST v3 (Ion)**, région **eu-west-3 (Paris)** |
-| Infrastructure as code | SST v3 (Ion) | TypeScript-first, Live Lambda pour le dev local, déploiement `sst deploy` |
+| Backend | AWS Lambda + API Gateway | Déployé via **Serverless Framework**, région **eu-west-3 (Paris)** |
+| Infrastructure as code | Serverless Framework (`serverless.yml`) | Bundling esbuild, secrets via SSM Parameter Store, `serverless offline` pour le dev local, déploiement `serverless deploy` |
 | Base de données | MongoDB Atlas | Cluster **existant** — Atlas Search pour le full-text |
 | Stockage fichiers | AWS S3 | Bucket en **eu-west-3**, intégration native Lambda |
 | Authentification | JWT + refresh tokens | Stateless, sécurisé, compatible Netlify + Lambda séparés |
@@ -398,7 +398,7 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 Netlify                     AWS (eu-west-3)
 ┌─────────────┐             ┌──────────────────────────────┐
 │  Next.js    │  REST API   │  API Gateway                 │
-│  (frontend) │ ──────────► │    └── AWS Lambda (SST)      │
+│  (frontend) │ ──────────► │    └── AWS Lambda (Hono)     │
 │             │             │          └── MongoDB Atlas    │
 └─────────────┘             │          └── S3 (images)     │
                             └──────────────────────────────┘

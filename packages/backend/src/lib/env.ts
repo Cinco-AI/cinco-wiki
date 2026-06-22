@@ -1,4 +1,4 @@
-/** Accès centralisé aux variables d'environnement / secrets SST. */
+/** Accès centralisé aux variables d'environnement (injectées via SSM par serverless.yml). */
 
 function required(name: string): string {
   const v = process.env[name];

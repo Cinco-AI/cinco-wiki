@@ -1,0 +1,100 @@
+# Cinco Wiki — backend Serverless Framework.
+# Région eu-west-3 (Paris). Le frontend Next.js est déployé séparément sur
+# Netlify : ce fichier ne gère que l'API (API Gateway HTTP API + Lambda Hono)
+# et le stockage S3 des images.
+#
+# Secrets (par stage) dans SSM Parameter Store — cf. scripts/set-secrets.sh :
+#   /cinco-wiki/<stage>/MONGODB_URI   (SecureString, requis)
+#   /cinco-wiki/<stage>/JWT_SECRET    (SecureString, requis)
+#   /cinco-wiki/<stage>/MONGODB_DB    (String, défaut "cinco-wiki")
+#   /cinco-wiki/<stage>/CORS_ORIGINS  (String, défaut "*")
+
+service: cinco-wiki
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-3
+  stage: ${opt:stage, 'dev'}
+  architecture: arm64
+  memorySize: 512
+  timeout: 29
+  httpApi:
+    cors: false # CORS géré dans Hono
+  environment:
+    MONGODB_URI: ${ssm:/cinco-wiki/${sls:stage}/MONGODB_URI}
+    MONGODB_DB: ${ssm:/cinco-wiki/${sls:stage}/MONGODB_DB, 'cinco-wiki'}
+    JWT_SECRET: ${ssm:/cinco-wiki/${sls:stage}/JWT_SECRET}
+    CORS_ORIGINS: ${ssm:/cinco-wiki/${sls:stage}/CORS_ORIGINS, '*'}
+    BUCKET_NAME: ${self:custom.bucketName}
+  iam:
+    role:
+      statements:
+        # Le presign PUT est signé avec les creds du rôle Lambda → besoin de PutObject.
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource: arn:aws:s3:::${self:custom.bucketName}/*
+
+custom:
+  # Surchargeable : sls deploy --param="bucketName=mon-bucket".
+  bucketName: ${param:bucketName, '${self:service}-uploads-${sls:stage}'}
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: linked
+    target: node20
+    platform: node
+    format: cjs
+
+functions:
+  api:
+    handler: packages/backend/src/index.handler
+    # Catch-all : toutes les méthodes / tous les chemins → router interne Hono.
+    events:
+      - httpApi: '*'
+
+resources:
+  Resources:
+    UploadsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        # Lecture publique : les URLs S3 sont servies directement dans les cards/modals.
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced
+        # Upload navigateur → S3 via URL pré-signée PUT (cf. ImageUploader.tsx).
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET, PUT, HEAD]
+              AllowedOrigins: ['*']
+              MaxAgeSeconds: 3000
+    UploadsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: UploadsBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action: s3:GetObject
+              Resource: arn:aws:s3:::${self:custom.bucketName}/*
+  Outputs:
+    UploadsBucketName:
+      Value:
+        Ref: UploadsBucket
