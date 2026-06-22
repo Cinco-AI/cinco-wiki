@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { Suspense, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { NavBar } from "@/components/NavBar";
 import { Spinner } from "@/components/Spinner";
@@ -27,8 +27,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <NavBar />
-      <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
+      <Suspense fallback={null}>
+        <NavBar />
+      </Suspense>
+      <main className="mx-auto max-w-7xl px-4 py-6">
+        <Suspense fallback={null}>{children}</Suspense>
+      </main>
     </>
   );
 }

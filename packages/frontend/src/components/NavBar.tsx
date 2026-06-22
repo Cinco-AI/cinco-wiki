@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FileText,
   LogOut,
@@ -23,10 +23,16 @@ import { NotificationsBell } from "@/components/NotificationsBell";
 export function NavBar() {
   const { user, isAdmin, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Affiche la recherche active depuis l'URL (/?q=…).
+  useEffect(() => {
+    setQuery(searchParams.get("q") ?? "");
+  }, [searchParams]);
 
   // Fermeture du menu compte au clic extérieur + Échap.
   useEffect(() => {
@@ -139,7 +145,7 @@ export function NavBar() {
                   <MenuLink href="/profil" icon={User} onSelect={() => setMenuOpen(false)}>
                     Mon profil
                   </MenuLink>
-                  <MenuLink href="/?mine" icon={FileText} onSelect={() => setMenuOpen(false)}>
+                  <MenuLink href="/?mine=true" icon={FileText} onSelect={() => setMenuOpen(false)}>
                     Mes notes
                   </MenuLink>
                 </div>
@@ -208,7 +214,7 @@ export function NavBar() {
             <MobileLink href="/notes/new" icon={Plus} onSelect={() => setMobileOpen(false)}>
               Nouvelle note
             </MobileLink>
-            <MobileLink href="/?mine" icon={FileText} onSelect={() => setMobileOpen(false)}>
+            <MobileLink href="/?mine=true" icon={FileText} onSelect={() => setMobileOpen(false)}>
               Mes notes
             </MobileLink>
             <MobileLink href="/profil" icon={User} onSelect={() => setMobileOpen(false)}>

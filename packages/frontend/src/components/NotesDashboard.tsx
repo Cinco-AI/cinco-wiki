@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { Loader2 } from "lucide-react";
 import type { NoteCard as NoteCardDto, NoteQuery, UserPublic } from "@cinco-wiki/shared";
@@ -11,6 +11,7 @@ import { SearchFilters } from "@/components/SearchFilters";
 import { NoteModal } from "@/components/NoteModal";
 import { EmptyState } from "@/components/EmptyState";
 import { Spinner } from "@/components/Spinner";
+import { noteQueryToSearchParams, parseNoteQueryFromSearchParams } from "@/lib/note-query-url";
 
 interface NotesDashboardProps {
   openNoteId?: string;
@@ -23,17 +24,26 @@ interface NotesDashboardProps {
  */
 export function NotesDashboard({ openNoteId, initialTag }: NotesDashboardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Filtre courant. Vue globale par défaut (toutes les notes publiées) ;
-  // « Mes notes » est une bascule explicite dans SearchFilters.
-  const [query, setQuery] = useState<NoteQuery>(() => ({
-    tags: initialTag ? [initialTag] : undefined,
-    sort: "recent",
-  }));
+  const [cursor, setCursor] = useState<string | undefined>();
 
   // Items des pages déjà chargées (avant le curseur courant) : permet
   // d'accumuler les pages sans useSWRInfinite.
   const [prevPages, setPrevPages] = useState<NoteCardDto[]>([]);
+
+  // Filtres dérivés de l'URL (NavBar, liens « Mes notes », partage).
+  const filterQuery = useMemo<NoteQuery>(() => {
+    const fromUrl = parseNoteQueryFromSearchParams(searchParams);
+    return {
+      ...fromUrl,
+      tags: initialTag ? [initialTag] : fromUrl.tags,
+      sort: fromUrl.sort ?? "recent",
+    };
+  }, [searchParams, initialTag]);
+
+  const query = useMemo<NoteQuery>(() => ({ ...filterQuery, cursor }), [filterQuery, cursor]);
 
   const { data, error, isLoading, isValidating } = useSWR(
     ["notes", query],
@@ -58,25 +68,36 @@ export function NotesDashboard({ openNoteId, initialTag }: NotesDashboardProps) 
     return [...map.values()];
   }, [items]);
 
-  // Resynchronise le filtre quand le tag de la route (/tags/[tag]) change.
-  const lastTag = useRef(initialTag);
+  // Réinitialise la pagination quand les filtres changent (URL ou tag de route).
+  const filterKey = useMemo(() => JSON.stringify(filterQuery), [filterQuery]);
+  const lastFilterKey = useRef(filterKey);
   useEffect(() => {
-    if (initialTag !== lastTag.current) {
-      lastTag.current = initialTag;
-      setPrevPages([]);
-      setQuery((q) => ({ ...q, tags: initialTag ? [initialTag] : undefined, cursor: undefined }));
-    }
-  }, [initialTag]);
+    if (filterKey === lastFilterKey.current) return;
+    lastFilterKey.current = filterKey;
+    setPrevPages([]);
+    setCursor(undefined);
+  }, [filterKey]);
+
+  function filterPath(): string {
+    if (openNoteId) return "/";
+    return pathname;
+  }
 
   function applyQuery(next: NoteQuery) {
-    setPrevPages([]);
-    setQuery({ ...next, cursor: undefined });
+    const { cursor: _cursor, ...filters } = next;
+    const merged: NoteQuery = {
+      ...filters,
+      tags: initialTag ? [initialTag] : filters.tags,
+    };
+    const qs = noteQueryToSearchParams(merged).toString();
+    const target = qs ? `${filterPath()}?${qs}` : filterPath();
+    router.replace(target, { scroll: false });
   }
 
   function loadMore() {
     if (!data?.nextCursor) return;
     setPrevPages(items); // fige la liste affichée avant de charger la suite
-    setQuery((q) => ({ ...q, cursor: data.nextCursor! }));
+    setCursor(data.nextCursor);
   }
 
   const loadingMore = isValidating && Boolean(query.cursor);
