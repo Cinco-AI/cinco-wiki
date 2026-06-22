@@ -8,6 +8,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Eye,
+  EyeOff,
   KeyRound,
   Loader2,
   MoreVertical,
@@ -296,9 +298,9 @@ export function UserManagementTable() {
       {modal?.type === "create" && (
         <CreateUserModal
           onClose={() => setModal(null)}
-          onCreated={(result) => {
+          onCreated={() => {
             void mutate();
-            setModal({ type: "tempPassword", data: result });
+            setModal(null);
           }}
         />
       )}
@@ -574,14 +576,16 @@ function CreateUserModal({
   onCreated,
 }: {
   onClose: () => void;
-  onCreated: (result: UserWithTempPassword) => void;
+  onCreated: () => void;
 }) {
   const [form, setForm] = useState<CreateUserInput>({
     firstName: "",
     lastName: "",
     email: "",
+    password: "",
     role: "user",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -590,13 +594,14 @@ function CreateUserModal({
     setBusy(true);
     setError(null);
     try {
-      const result = await api.createUser({
+      await api.createUser({
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
         email: form.email.trim(),
+        password: form.password,
         role: form.role,
       });
-      onCreated(result);
+      onCreated();
     } catch (err) {
       setError(errorMessage(err, "La création du compte a échoué. Réessayez."));
       setBusy(false);
@@ -637,6 +642,35 @@ function CreateUserModal({
             onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             className={FIELD_CLASS}
           />
+        </Field>
+        <Field id="create-password" label="Mot de passe">
+          <div className="relative">
+            <input
+              id="create-password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={form.password}
+              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+              className={cn(FIELD_CLASS, "pr-10")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-gray-400 transition hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
+            >
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" aria-hidden />
+              ) : (
+                <Eye className="h-5 w-5" aria-hidden />
+              )}
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            8 caractères minimum. Communiquez-le à l'utilisateur.
+          </p>
         </Field>
         <Field id="create-role" label="Rôle">
           <select

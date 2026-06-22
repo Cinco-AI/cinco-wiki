@@ -168,6 +168,8 @@ export interface CreateUserInput {
   firstName: string;
   lastName: string;
   email: string;
+  /** Mot de passe initial défini par l'administrateur (8 caractères min). */
+  password: string;
   role: UserRole;
 }
 
@@ -179,7 +181,7 @@ export interface UpdateUserInput {
   status?: UserStatus;
 }
 
-/** Réponse de création/réinit : le mot de passe temporaire est montré 1 fois. */
+/** Réponse de réinit. mot de passe : le mot de passe temporaire est montré 1 fois. */
 export interface UserWithTempPassword {
   user: UserAdmin;
   temporaryPassword: string;

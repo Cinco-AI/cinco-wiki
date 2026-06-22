@@ -32,6 +32,7 @@ const createUserSchema = z.object({
   firstName: z.string().trim().min(1),
   lastName: z.string().trim().min(1),
   email: z.string().email(),
+  password: z.string().min(8),
   role: roleSchema,
 });
 
@@ -133,7 +134,7 @@ usersRoutes.get("/", requireAdmin, async (c) => {
   });
 });
 
-// POST /users — crée un utilisateur + mot de passe temporaire.
+// POST /users — crée un utilisateur ; l'admin choisit le mot de passe.
 usersRoutes.post("/", requireAdmin, async (c) => {
   const db = c.get("db");
   const input = await body(c, createUserSchema);
@@ -142,8 +143,7 @@ usersRoutes.post("/", requireAdmin, async (c) => {
   const exists = await collections.users(db).findOne({ email });
   if (exists) throw errors.conflict("E-mail déjà utilisé");
 
-  const temporaryPassword = generateTempPassword();
-  const passwordHash = await hashPassword(temporaryPassword);
+  const passwordHash = await hashPassword(input.password);
   const now = new Date();
 
   const doc: UserDoc = {
@@ -168,7 +168,7 @@ usersRoutes.post("/", requireAdmin, async (c) => {
     "Votre compte Cinco Wiki a été créé.",
   );
 
-  return c.json({ user: toUserAdmin(doc), temporaryPassword });
+  return c.json(toUserAdmin(doc));
 });
 
 // PUT /users/:id — modifie profil/role/status.

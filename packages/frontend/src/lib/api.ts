@@ -204,7 +204,7 @@ export const api = {
   listUsers: (q?: string) =>
     request<Paginated<UserAdmin>>("/users", { query: { q } }),
   createUser: (input: CreateUserInput) =>
-    request<UserWithTempPassword>("/users", { method: "POST", body: input }),
+    request<UserAdmin>("/users", { method: "POST", body: input }),
   updateUser: (id: string, input: UpdateUserInput) =>
     request<UserAdmin>(`/users/${id}`, { method: "PUT", body: input }),
   resetUserPassword: (id: string) =>
