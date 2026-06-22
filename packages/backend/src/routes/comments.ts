@@ -21,6 +21,10 @@ const commentSchema = z.object({
   text: z.string().trim().min(1, "Commentaire vide").max(LIMITS.commentMax),
 });
 
+const reactionSchema = z.object({
+  emoji: z.string().trim().min(1, "Emoji requis").max(16),
+});
+
 /**
  * Applique la visibilité des brouillons (§notes) aux commentaires :
  * un brouillon n'est accessible qu'à son auteur ou à un admin.
@@ -48,7 +52,8 @@ commentsRoutes.get("/:noteId", async (c) => {
     .toArray();
 
   const resolve = await authorResolver(db, docs.map((d) => d.authorId));
-  return c.json(docs.map((d) => toComment(d, resolve(d.authorId))));
+  const viewerId = c.get("userId");
+  return c.json(docs.map((d) => toComment(d, resolve(d.authorId), viewerId)));
 });
 
 // POST /comments/:noteId — ajoute un commentaire + notifie l'auteur de la note.
@@ -84,7 +89,7 @@ commentsRoutes.post("/:noteId", async (c) => {
     );
   }
 
-  return c.json(toComment(doc, toUserPublic(user)), 201);
+  return c.json(toComment(doc, toUserPublic(user), c.get("userId")), 201);
 });
 
 // PUT /comments/item/:id — édition par l'auteur du commentaire uniquement.
@@ -102,7 +107,44 @@ commentsRoutes.put("/item/:id", async (c) => {
 
   const updatedAt = new Date();
   await collections.comments(db).updateOne({ _id: id }, { $set: { text, updatedAt } });
-  return c.json(toComment({ ...comment, text, updatedAt }, toUserPublic(user)));
+  return c.json(toComment({ ...comment, text, updatedAt }, toUserPublic(user), c.get("userId")));
+});
+
+// POST /comments/item/:id/reactions — bascule la réaction emoji du lecteur (toggle).
+commentsRoutes.post("/item/:id/reactions", async (c) => {
+  const id = oid(c.req.param("id"));
+  const { emoji } = await body(c, reactionSchema);
+  const db = c.get("db");
+  const user = await currentUser(c);
+
+  const comment = await collections.comments(db).findOne({ _id: id });
+  if (!comment) throw errors.notFound("Commentaire introuvable");
+
+  const note = await collections.notes(db).findOne({ _id: comment.noteId });
+  if (!note) throw errors.notFound("Note introuvable");
+  assertNoteVisible(note, user._id, c.get("role"));
+
+  const reactions = (comment.reactions ?? []).map((r) => ({ ...r, userIds: [...r.userIds] }));
+  const group = reactions.find((r) => r.emoji === emoji);
+  if (group) {
+    const had = group.userIds.some((uid) => uid.equals(user._id));
+    group.userIds = had
+      ? group.userIds.filter((uid) => !uid.equals(user._id))
+      : [...group.userIds, user._id];
+  } else {
+    if (reactions.length >= LIMITS.commentReactionsMax) {
+      throw errors.badRequest("Trop de réactions différentes sur ce commentaire");
+    }
+    reactions.push({ emoji, userIds: [user._id] });
+  }
+  const next = reactions.filter((r) => r.userIds.length > 0);
+
+  await collections.comments(db).updateOne({ _id: id }, { $set: { reactions: next } });
+
+  const resolve = await authorResolver(db, [comment.authorId]);
+  return c.json(
+    toComment({ ...comment, reactions: next }, resolve(comment.authorId), c.get("userId")),
+  );
 });
 
 // DELETE /comments/item/:id — auteur du commentaire, auteur de la note, ou admin.

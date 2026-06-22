@@ -90,12 +90,24 @@ export function toNoteCard(doc: NoteDoc, author: UserPublic): NoteCard {
   };
 }
 
-export function toComment(doc: CommentDoc, author: UserPublic): Comment {
+export function toComment(
+  doc: CommentDoc,
+  author: UserPublic,
+  viewerId?: string,
+): Comment {
+  const reactions = (doc.reactions ?? [])
+    .filter((r) => r.userIds.length > 0)
+    .map((r) => ({
+      emoji: r.emoji,
+      count: r.userIds.length,
+      reacted: viewerId ? r.userIds.some((id) => id.toHexString() === viewerId) : false,
+    }));
   return {
     id: doc._id.toHexString(),
     noteId: doc.noteId.toHexString(),
     author,
     text: doc.text,
+    reactions,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

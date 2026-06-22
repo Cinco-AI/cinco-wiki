@@ -10,6 +10,8 @@
 export const LIMITS = {
   noteTitleMax: 200,
   commentMax: 1000,
+  /** Nombre d'emojis distincts maximum par commentaire. */
+  commentReactionsMax: 20,
   tagsPerNote: 10,
   imagesPerNote: 10,
   imageMaxBytes: 5 * 1024 * 1024,
@@ -153,11 +155,20 @@ export interface NoteCard {
   updatedAt: string;
 }
 
+/** Réaction emoji agrégée sur un commentaire, du point de vue du lecteur. */
+export interface CommentReaction {
+  emoji: string;
+  count: number;
+  /** Vrai si le lecteur courant a réagi avec cet emoji. */
+  reacted: boolean;
+}
+
 export interface Comment {
   id: string;
   noteId: string;
   author: UserPublic;
   text: string;
+  reactions: CommentReaction[];
   createdAt: string;
   updatedAt: string;
 }
@@ -243,6 +254,10 @@ export interface NoteInput {
 
 export interface CommentInput {
   text: string;
+}
+
+export interface ReactionInput {
+  emoji: string;
 }
 
 export interface VoteInput {

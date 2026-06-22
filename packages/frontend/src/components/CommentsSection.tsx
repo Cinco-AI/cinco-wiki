@@ -82,7 +82,7 @@ export function CommentsSection({ noteId }: { noteId: string }) {
       )}
 
       {sorted.length > 0 && (
-        <ul className="space-y-3">
+        <ul className="space-y-4">
           {sorted.map((comment) => (
             <CommentItem
               key={comment.id}
@@ -160,7 +160,7 @@ function CommentItem({
   }
 
   return (
-    <li className="flex gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition hover:shadow">
+    <li className="relative flex gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition hover:shadow">
       <Avatar user={comment.author} size="sm" />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -266,6 +266,8 @@ function CommentItem({
         )}
       </div>
 
+      {!editing && <ReactionBar comment={comment} onChanged={onChanged} />}
+
       <ConfirmDialog
         open={confirming}
         title="Supprimer le commentaire"
@@ -277,6 +279,63 @@ function CommentItem({
         onCancel={() => setConfirming(false)}
       />
     </li>
+  );
+}
+
+/** Pastilles de réactions + ajout d'emoji, façon Slack (toggle par lecteur). */
+function ReactionBar({
+  comment,
+  onChanged,
+}: {
+  comment: Comment;
+  onChanged: () => void;
+}) {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState(false);
+
+  async function toggle(emoji: string) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await api.toggleReaction(comment.id, emoji);
+      onChanged();
+    } catch {
+      // Échec silencieux : l'état se resynchronise au prochain chargement.
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (comment.reactions?.length === 0 && !user) return null;
+
+  return (
+    <div className="absolute bottom-0 right-3 z-10 flex -translate-y-1/2 flex-wrap items-center justify-end gap-1.5 drop-shadow-sm">
+      {comment.reactions?.map((r) => (
+        <button
+          key={r.emoji}
+          type="button"
+          onClick={() => void toggle(r.emoji)}
+          disabled={busy || !user}
+          aria-pressed={r.reacted}
+          title={r.reacted ? "Retirer votre réaction" : "Réagir"}
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition disabled:opacity-60",
+            r.reacted
+              ? "border-brand-300 bg-brand-50 text-brand-700"
+              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
+          )}
+        >
+          <span className="text-sm leading-none">{r.emoji}</span>
+          <span className="font-medium tabular-nums">{r.count}</span>
+        </button>
+      ))}
+      {user && (
+        <EmojiPicker
+          onSelect={(emoji) => void toggle(emoji)}
+          className="[&>button]:h-7 [&>button]:w-7"
+        />
+      )}
+    </div>
   );
 }
 

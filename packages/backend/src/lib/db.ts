@@ -58,11 +58,19 @@ export interface VoteDoc {
   updatedAt: Date;
 }
 
+/** Réaction emoji + la liste des utilisateurs qui l'ont posée (dénormalisé). */
+export interface CommentReactionDoc {
+  emoji: string;
+  userIds: ObjectId[];
+}
+
 export interface CommentDoc {
   _id: ObjectId;
   noteId: ObjectId;
   authorId: ObjectId | null;
   text: string;
+  /** Optionnel : absent sur les commentaires créés avant la fonctionnalité. */
+  reactions?: CommentReactionDoc[];
   createdAt: Date;
   updatedAt: Date;
 }

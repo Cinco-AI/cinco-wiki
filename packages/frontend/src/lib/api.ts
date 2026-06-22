@@ -177,6 +177,8 @@ export const api = {
   updateComment: (id: string, input: CommentInput) =>
     request<Comment>(`/comments/item/${id}`, { method: "PUT", body: input }),
   deleteComment: (id: string) => request<void>(`/comments/item/${id}`, { method: "DELETE" }),
+  toggleReaction: (id: string, emoji: string) =>
+    request<Comment>(`/comments/item/${id}/reactions`, { method: "POST", body: { emoji } }),
 
   // --- Tags ---
   listTags: () => request<Tag[]>("/tags"),
