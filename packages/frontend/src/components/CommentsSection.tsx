@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 import { Loader2, MessageSquare, Pencil, Send, Trash2 } from "lucide-react";
 import type { Comment } from "@cinco-wiki/shared";
@@ -11,6 +11,28 @@ import { relativeDate, fullName } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { Avatar } from "@/components/Avatar";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { EmojiPicker } from "@/components/EmojiPicker";
+
+/** Insère `emoji` à la position du curseur dans un textarea contrôlé. */
+function insertEmojiAtCursor(
+  textarea: HTMLTextAreaElement | null,
+  current: string,
+  emoji: string,
+  setValue: (next: string) => void,
+) {
+  const start = textarea?.selectionStart ?? current.length;
+  const end = textarea?.selectionEnd ?? current.length;
+  const next = current.slice(0, start) + emoji + current.slice(end);
+  if (next.length > LIMITS.commentMax) return;
+  setValue(next);
+  // Restaure le focus + le curseur après le rendu React.
+  requestAnimationFrame(() => {
+    if (!textarea) return;
+    const pos = start + emoji.length;
+    textarea.focus();
+    textarea.setSelectionRange(pos, pos);
+  });
+}
 
 export function CommentsSection({ noteId }: { noteId: string }) {
   const { user, isAdmin } = useAuth();
@@ -94,6 +116,7 @@ function CommentItem({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const edited = comment.updatedAt !== comment.createdAt;
 
   async function save() {
@@ -157,6 +180,7 @@ function CommentItem({
         {editing ? (
           <div className="mt-2 space-y-2">
             <textarea
+              ref={textareaRef}
               value={draft}
               autoFocus
               maxLength={LIMITS.commentMax}
@@ -175,6 +199,11 @@ function CommentItem({
               aria-label="Modifier le commentaire"
             />
             <div className="flex items-center gap-2">
+              <EmojiPicker
+                onSelect={(emoji) =>
+                  insertEmojiAtCursor(textareaRef.current, draft, emoji, setDraft)
+                }
+              />
               <button
                 type="button"
                 onClick={() => void save()}
@@ -262,6 +291,7 @@ function CommentForm({
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -295,6 +325,7 @@ function CommentForm({
         </label>
         <textarea
           id="new-comment"
+          ref={textareaRef}
           value={text}
           rows={3}
           maxLength={LIMITS.commentMax}
@@ -314,16 +345,23 @@ function CommentForm({
           </p>
         )}
         <div className="mt-2 flex items-center justify-between gap-2">
-          <span
-            className={cn(
-              "text-xs",
-              remaining <= 50 ? "text-red-500" : "text-gray-400",
-            )}
-            aria-live="polite"
-          >
-            {remaining} caractère{remaining > 1 ? "s" : ""} restant
-            {remaining > 1 ? "s" : ""}
-          </span>
+          <div className="flex items-center gap-2">
+            <EmojiPicker
+              onSelect={(emoji) =>
+                insertEmojiAtCursor(textareaRef.current, text, emoji, setText)
+              }
+            />
+            <span
+              className={cn(
+                "text-xs",
+                remaining <= 50 ? "text-red-500" : "text-gray-400",
+              )}
+              aria-live="polite"
+            >
+              {remaining} caractère{remaining > 1 ? "s" : ""} restant
+              {remaining > 1 ? "s" : ""}
+            </span>
+          </div>
           <button
             type="submit"
             disabled={busy || text.trim().length === 0}
