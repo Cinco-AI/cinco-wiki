@@ -1,1 +1,0 @@
-{"nodes": [{"id": "frontend_tailwindconfig", "label": "Tailwind Config (brand palette + animations)", "file_type": "code", "source_file": "packages/frontend/tailwind.config.ts", "source_location": "line 1", "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}

@@ -24,6 +24,9 @@ sst-env.d.ts
 .env.local
 .env*.local
 
+# graphify
+graphify-out/
+
 # misc
 .DS_Store
 *.log
