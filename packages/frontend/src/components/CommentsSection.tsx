@@ -345,11 +345,11 @@ function ReactionBar({
             {names && (
               <div
                 role="tooltip"
-                className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 z-30 w-max max-w-[min(16rem,calc(100vw-2rem))] -translate-x-1/2 rounded-lg bg-gray-900 px-2.5 py-1.5 text-center text-xs leading-snug text-white opacity-0 shadow-lg transition-opacity group-hover/reaction:opacity-100 group-focus-within/reaction:opacity-100"
+                className="pointer-events-none absolute bottom-full right-0 z-30 mb-1.5 max-w-[14rem] rounded-lg bg-gray-900 px-2.5 py-1.5 text-left text-xs leading-snug text-white whitespace-normal opacity-0 shadow-lg transition-opacity group-hover/reaction:opacity-100 group-focus-within/reaction:opacity-100"
               >
                 {names}
                 <span
-                  className="absolute left-1/2 top-full -translate-x-1/2 border-[5px] border-transparent border-t-gray-900"
+                  className="absolute right-3 top-full border-[5px] border-transparent border-t-gray-900"
                   aria-hidden="true"
                 />
               </div>

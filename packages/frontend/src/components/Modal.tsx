@@ -105,7 +105,7 @@ export function Modal({
         tabIndex={-1}
         onKeyDown={onKeyDown}
         className={cn(
-          "scrollbar-thin relative max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-white shadow-xl animate-scale-in focus:outline-none",
+          "scrollbar-thin relative max-h-[90vh] w-full overflow-x-hidden overflow-y-auto rounded-2xl bg-white shadow-xl animate-scale-in focus:outline-none",
           SIZE[size],
           className,
         )}
