@@ -282,6 +282,11 @@ function CommentItem({
   );
 }
 
+/** Liste des prénoms/noms pour l'infobulle de réaction. */
+function reactionUsersLabel(users: Comment["reactions"][number]["users"]): string {
+  return users.map((u) => fullName(u)).join(", ");
+}
+
 /** Pastilles de réactions + ajout d'emoji, façon Slack (toggle par lecteur). */
 function ReactionBar({
   comment,
@@ -310,25 +315,48 @@ function ReactionBar({
 
   return (
     <div className="absolute bottom-0 right-3 z-10 flex -translate-y-1/2 flex-wrap items-center justify-end gap-1.5 drop-shadow-sm">
-      {comment.reactions?.map((r) => (
-        <button
-          key={r.emoji}
-          type="button"
-          onClick={() => void toggle(r.emoji)}
-          disabled={busy || !user}
-          aria-pressed={r.reacted}
-          title={r.reacted ? "Retirer votre réaction" : "Réagir"}
-          className={cn(
-            "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition disabled:opacity-60",
-            r.reacted
-              ? "border-brand-300 bg-brand-50 text-brand-700"
-              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
-          )}
-        >
-          <span className="text-sm leading-none">{r.emoji}</span>
-          <span className="font-medium tabular-nums">{r.count}</span>
-        </button>
-      ))}
+      {comment.reactions?.map((r) => {
+        const names = reactionUsersLabel(r.users);
+        return (
+          <div key={r.emoji} className="group/reaction relative">
+            <button
+              type="button"
+              onClick={() => void toggle(r.emoji)}
+              disabled={busy || !user}
+              aria-pressed={r.reacted}
+              aria-label={
+                names
+                  ? `${r.emoji} : ${names}${r.reacted ? " (retirer votre réaction)" : ""}`
+                  : r.reacted
+                    ? "Retirer votre réaction"
+                    : "Réagir"
+              }
+              title={names || undefined}
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition disabled:opacity-60",
+                r.reacted
+                  ? "border-brand-300 bg-brand-50 text-brand-700"
+                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
+              )}
+            >
+              <span className="text-sm leading-none">{r.emoji}</span>
+              <span className="font-medium tabular-nums">{r.count}</span>
+            </button>
+            {names && (
+              <div
+                role="tooltip"
+                className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 z-30 w-max max-w-[min(16rem,calc(100vw-2rem))] -translate-x-1/2 rounded-lg bg-gray-900 px-2.5 py-1.5 text-center text-xs leading-snug text-white opacity-0 shadow-lg transition-opacity group-hover/reaction:opacity-100 group-focus-within/reaction:opacity-100"
+              >
+                {names}
+                <span
+                  className="absolute left-1/2 top-full -translate-x-1/2 border-[5px] border-transparent border-t-gray-900"
+                  aria-hidden="true"
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
       {user && (
         <EmojiPicker
           align="end"

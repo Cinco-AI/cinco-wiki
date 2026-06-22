@@ -161,6 +161,8 @@ export interface CommentReaction {
   count: number;
   /** Vrai si le lecteur courant a réagi avec cet emoji. */
   reacted: boolean;
+  /** Utilisateurs ayant réagi avec cet emoji (pour infobulle au survol). */
+  users: UserPublic[];
 }
 
 export interface Comment {

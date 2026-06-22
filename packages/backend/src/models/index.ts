@@ -8,6 +8,7 @@ import type {
   UserSelf,
 } from "@cinco-wiki/shared";
 import { buildExcerpt } from "@cinco-wiki/shared";
+import { ObjectId } from "mongodb";
 import type {
   CommentDoc,
   NoteDoc,
@@ -94,13 +95,16 @@ export function toComment(
   doc: CommentDoc,
   author: UserPublic,
   viewerId?: string,
+  resolveUser?: (id: ObjectId) => UserPublic,
 ): Comment {
+  const resolve = resolveUser ?? (() => DELETED_USER);
   const reactions = (doc.reactions ?? [])
     .filter((r) => r.userIds.length > 0)
     .map((r) => ({
       emoji: r.emoji,
       count: r.userIds.length,
       reacted: viewerId ? r.userIds.some((id) => id.toHexString() === viewerId) : false,
+      users: r.userIds.map((id) => resolve(id)),
     }));
   return {
     id: doc._id.toHexString(),

@@ -51,9 +51,12 @@ commentsRoutes.get("/:noteId", async (c) => {
     .sort({ createdAt: 1 })
     .toArray();
 
-  const resolve = await authorResolver(db, docs.map((d) => d.authorId));
+  const resolve = await authorResolver(
+    db,
+    docs.flatMap((d) => [d.authorId, ...(d.reactions ?? []).flatMap((r) => r.userIds)]),
+  );
   const viewerId = c.get("userId");
-  return c.json(docs.map((d) => toComment(d, resolve(d.authorId), viewerId)));
+  return c.json(docs.map((d) => toComment(d, resolve(d.authorId), viewerId, resolve)));
 });
 
 // POST /comments/:noteId — ajoute un commentaire + notifie l'auteur de la note.
@@ -141,9 +144,12 @@ commentsRoutes.post("/item/:id/reactions", async (c) => {
 
   await collections.comments(db).updateOne({ _id: id }, { $set: { reactions: next } });
 
-  const resolve = await authorResolver(db, [comment.authorId]);
+  const resolve = await authorResolver(
+    db,
+    [comment.authorId, ...next.flatMap((r) => r.userIds)],
+  );
   return c.json(
-    toComment({ ...comment, reactions: next }, resolve(comment.authorId), c.get("userId")),
+    toComment({ ...comment, reactions: next }, resolve(comment.authorId), c.get("userId"), resolve),
   );
 });
 
