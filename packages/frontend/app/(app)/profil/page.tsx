@@ -16,6 +16,7 @@ import { fullName } from "@/lib/format";
 import { Avatar } from "@/components/Avatar";
 import { ImageUploader } from "@/components/ImageUploader";
 import { Spinner } from "@/components/Spinner";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function ProfilPage() {
   const { user, loading, refreshUser } = useAuth();
@@ -120,13 +121,18 @@ export default function ProfilPage() {
   return (
     <main className="mx-auto w-full max-w-3xl space-y-8 px-4 py-8">
       {/* En-tête */}
-      <header className="flex items-center gap-4">
-        <Avatar user={previewUser} size="lg" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{fullName(user)}</h1>
-          <p className="text-sm text-gray-500">{user.email}</p>
-        </div>
-      </header>
+      <div className="space-y-4">
+        <Breadcrumbs
+          items={[{ label: "Accueil", href: "/" }, { label: "Mon profil" }]}
+        />
+        <header className="flex items-center gap-4">
+          <Avatar user={previewUser} size="lg" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{fullName(user)}</h1>
+            <p className="text-sm text-gray-500">{user.email}</p>
+          </div>
+        </header>
+      </div>
 
       {/* Statistiques */}
       <section className="grid grid-cols-3 gap-3">

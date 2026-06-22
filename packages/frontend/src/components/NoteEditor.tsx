@@ -20,6 +20,7 @@ import { DocumentUploader } from "@/components/DocumentUploader";
 import { TagInput } from "@/components/TagInput";
 import { Spinner } from "@/components/Spinner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 interface NoteEditorProps {
   mode: "create" | "edit";
@@ -256,6 +257,13 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
 
   return (
     <form onSubmit={handlePublish} className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+      <Breadcrumbs
+        className="mb-2"
+        items={[
+          { label: "Accueil", href: "/" },
+          { label: isEdit ? "Modifier la note" : "Nouvelle note" },
+        ]}
+      />
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-900">
           {isEdit ? "Modifier la note" : "Nouvelle note"}
