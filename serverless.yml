@@ -18,7 +18,10 @@ plugins:
 provider:
   name: aws
   runtime: nodejs20.x
-  region: eu-west-3
+  # Région : --region, sinon AWS_REGION, sinon eu-west-3.
+  # Profil : géré nativement par Serverless via AWS_PROFILE ou --aws-profile.
+  # NB : les secrets SSM sont par région → déployer dans la même région que set-secrets.sh.
+  region: ${opt:region, env:AWS_REGION, 'eu-west-3'}
   stage: ${opt:stage, 'dev'}
   architecture: arm64
   memorySize: 512

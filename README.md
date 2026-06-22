@@ -45,8 +45,9 @@ Les secrets vivent dans **SSM Parameter Store** (clés `/cinco-wiki/<stage>/<NOM
 Renseigner un `.env` à la racine (cf. `.env.example`) puis pousser une fois par stage :
 
 ```bash
-cp .env.example .env          # renseigner MONGODB_URI, JWT_SECRET, CORS_ORIGINS...
-npm run secrets:set dev       # ./scripts/set-secrets.sh dev — pousse .env vers SSM
+cp .env.example .env             # renseigner MONGODB_URI, JWT_SECRET, CORS_ORIGINS...
+npm run secrets:set              # stage dev (défaut) — pousse .env vers SSM
+npm run secrets:set -- production   # autre stage : args après --
 ```
 
 Détail des paramètres SSM créés :
@@ -60,6 +61,25 @@ Détail des paramètres SSM créés :
 
 `BUCKET_NAME` est dérivé automatiquement (`cinco-wiki-uploads-<stage>`) ;
 surchargeable via `--param="bucketName=..."`.
+
+### Région & profil AWS
+
+Région via `AWS_REGION` (défaut `eu-west-3`), profil via `AWS_PROFILE`. Valables pour
+`set-secrets.sh` **et** `serverless deploy`. ⚠️ Les secrets SSM sont **par région** :
+pousser et déployer dans la **même** région.
+
+```bash
+# au choix : exporter dans le shell (vaut pour les deux commandes)
+export AWS_PROFILE=cinco AWS_REGION=eu-west-3
+npm run secrets:set
+npm run deploy:dev
+
+# ou en flags (uniquement le déploiement)
+npm run deploy:dev -- --aws-profile cinco --region eu-west-3
+```
+
+`set-secrets.sh` lit aussi `AWS_REGION` / `AWS_PROFILE` depuis le `.env` (un export
+shell est prioritaire).
 
 Dev local (émulation API Gateway + Lambda) :
 

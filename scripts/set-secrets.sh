@@ -3,9 +3,20 @@
 # Remplace `sst secret set`. Lit les valeurs depuis un fichier .env (défaut: ./.env).
 #
 # Usage:
-#   ./scripts/set-secrets.sh <stage> [env-file]
-#   ./scripts/set-secrets.sh dev
+#   ./scripts/set-secrets.sh [stage] [env-file]   (stage défaut: dev)
+#   ./scripts/set-secrets.sh                       # stage dev, .env
 #   ./scripts/set-secrets.sh production .env.production
+#
+# Via npm (les args passent après --) :
+#   npm run secrets:set                # stage dev
+#   npm run secrets:set -- production
+#
+# Région / profil AWS (ordre de priorité, plus fort en premier) :
+#   1. variables shell    AWS_REGION=... AWS_PROFILE=... npm run secrets:set
+#   2. valeurs dans .env  (AWS_REGION=... / AWS_PROFILE=... dans le fichier .env)
+#   3. défaut région eu-west-3 ; profil = profil par défaut de l'AWS CLI
+# IMPORTANT : les paramètres SSM sont par région — utiliser la MÊME région ici
+# que pour `serverless deploy`, sinon `${ssm:...}` ne les trouvera pas.
 #
 # Variables attendues dans le fichier .env :
 #   MONGODB_URI   (requis)  -> SecureString
@@ -14,28 +25,34 @@
 #   CORS_ORIGINS  (optionnel, défaut "*")
 set -euo pipefail
 
-STAGE="${1:?Usage: set-secrets.sh <stage> [env-file]}"
+STAGE="${1:-dev}"
 ENV_FILE="${2:-.env}"
-REGION="${AWS_REGION:-eu-west-3}"
 PREFIX="/cinco-wiki/${STAGE}"
 
 [ -f "$ENV_FILE" ] || { echo "Fichier introuvable : $ENV_FILE" >&2; exit 1; }
 
-# Charge le .env sans exécuter de code arbitraire (lignes KEY=value uniquement).
+# Charge le .env (peut contenir AWS_REGION / AWS_PROFILE en plus des secrets).
 set -a
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 set +a
 
+# Résolu APRÈS le source : une var shell existante l'emporte sur le .env.
+REGION="${AWS_REGION:-${AWS_DEFAULT_REGION:-eu-west-3}}"
+PROFILE="${AWS_PROFILE:-}"
+
+AWS_ARGS=(--region "$REGION")
+[ -n "$PROFILE" ] && AWS_ARGS+=(--profile "$PROFILE")
+
 put() { # name value type
   local name="$1" value="$2" type="$3"
   [ -n "$value" ] || { echo "  skip $name (vide)"; return; }
-  aws ssm put-parameter --region "$REGION" \
+  aws ssm put-parameter "${AWS_ARGS[@]}" \
     --name "${PREFIX}/${name}" --type "$type" --value "$value" --overwrite >/dev/null
   echo "  set ${PREFIX}/${name} (${type})"
 }
 
-echo "SSM <- $ENV_FILE (stage=$STAGE, region=$REGION)"
+echo "SSM <- $ENV_FILE (stage=$STAGE, region=$REGION, profile=${PROFILE:-default})"
 put MONGODB_URI  "${MONGODB_URI:-}"            SecureString
 put JWT_SECRET   "${JWT_SECRET:-}"             SecureString
 put MONGODB_DB   "${MONGODB_DB:-cinco-wiki}"   String
