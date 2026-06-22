@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { relativeDate, fullName } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { Avatar } from "@/components/Avatar";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export function CommentsSection({ noteId }: { noteId: string }) {
   const { user, isAdmin } = useAuth();
@@ -92,6 +93,7 @@ function CommentItem({
   const [draft, setDraft] = useState(comment.text);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const edited = comment.updatedAt !== comment.createdAt;
 
   async function save() {
@@ -119,13 +121,14 @@ function CommentItem({
   }
 
   async function remove() {
-    if (!window.confirm("Supprimer ce commentaire ?")) return;
     setBusy(true);
     setError(null);
     try {
       await api.deleteComment(comment.id);
+      setConfirming(false);
       onChanged();
     } catch (err) {
+      setConfirming(false);
       setError(
         err instanceof ApiClientError ? err.message : "La suppression a échoué. Réessayez.",
       );
@@ -222,7 +225,7 @@ function CommentItem({
             {canDelete && (
               <button
                 type="button"
-                onClick={() => void remove()}
+                onClick={() => setConfirming(true)}
                 disabled={busy}
                 className="inline-flex items-center gap-1 rounded text-xs font-medium text-gray-500 transition hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:opacity-60"
               >
@@ -233,6 +236,17 @@ function CommentItem({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirming}
+        title="Supprimer le commentaire"
+        message="Supprimer ce commentaire ? Cette action est irréversible."
+        confirmLabel="Supprimer"
+        danger
+        busy={busy}
+        onConfirm={() => void remove()}
+        onCancel={() => setConfirming(false)}
+      />
     </li>
   );
 }

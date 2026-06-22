@@ -19,6 +19,7 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { TagInput } from "@/components/TagInput";
 import { Spinner } from "@/components/Spinner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface NoteEditorProps {
   mode: "create" | "edit";
@@ -68,6 +69,7 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
   );
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [submitting, setSubmitting] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   const idRef = useRef<string | null>(isEdit ? (noteId ?? null) : null);
   const statusRef = useRef<NoteStatus>("draft");
@@ -192,7 +194,10 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
   }
 
   function handleCancel() {
-    if (dirty && !window.confirm("Abandonner les modifications non enregistrées ?")) return;
+    if (dirty) {
+      setConfirmCancel(true);
+      return;
+    }
     router.push("/");
   }
 
@@ -337,6 +342,17 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
           Publier
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmCancel}
+        title="Modifications non enregistrées"
+        message="Abandonner les modifications non enregistrées ?"
+        confirmLabel="Abandonner"
+        cancelLabel="Continuer l'édition"
+        danger
+        onConfirm={() => router.push("/")}
+        onCancel={() => setConfirmCancel(false)}
+      />
     </form>
   );
 }
