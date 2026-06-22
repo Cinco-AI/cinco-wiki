@@ -15,8 +15,14 @@ import { ogRoutes } from "./routes/og.js";
 
 const app = new Hono<AppEnv>();
 
+// CORS : `env.corsOrigins` est une liste. Hono traite un tableau en
+// correspondance exacte → "*" n'y matche jamais une vraie origine. On gère donc
+// le joker en reflétant l'origine de la requête (compatible avec credentials,
+// contrairement au littéral "*").
+const corsAllowAll = env.corsOrigins.includes("*");
 app.use("*", cors({
-  origin: env.corsOrigins,
+  origin: (origin) =>
+    corsAllowAll ? origin || "*" : env.corsOrigins.includes(origin) ? origin : null,
   allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowHeaders: ["Authorization", "Content-Type"],
   credentials: true,

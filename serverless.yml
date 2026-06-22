@@ -84,7 +84,9 @@ resources:
             - AllowedHeaders: ['*']
               AllowedMethods: [GET, PUT, HEAD]
               AllowedOrigins: ['*']
-              MaxAgeSeconds: 3000
+              # Propriété CloudFormation = MaxAge (MaxAgeSeconds est le nom de
+              # l'API REST S3, rejeté par AWS::EarlyValidation::PropertyValidation).
+              MaxAge: 3000
     UploadsBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
