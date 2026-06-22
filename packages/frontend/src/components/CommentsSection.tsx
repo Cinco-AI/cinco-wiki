@@ -331,6 +331,7 @@ function ReactionBar({
       ))}
       {user && (
         <EmojiPicker
+          align="end"
           onSelect={(emoji) => void toggle(emoji)}
           className="[&>button]:h-7 [&>button]:w-7"
         />
@@ -378,7 +379,7 @@ function CommentForm({
   return (
     <form onSubmit={submit} className="flex gap-3 pt-1">
       {user && <Avatar user={user} size="sm" />}
-      <div className="min-w-0 flex-1">
+      <div className="relative min-w-0 flex-1">
         <label htmlFor="new-comment" className="sr-only">
           Ajouter un commentaire
         </label>
@@ -404,23 +405,16 @@ function CommentForm({
           </p>
         )}
         <div className="mt-2 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <EmojiPicker
-              onSelect={(emoji) =>
-                insertEmojiAtCursor(textareaRef.current, text, emoji, setText)
-              }
-            />
-            <span
-              className={cn(
-                "text-xs",
-                remaining <= 50 ? "text-red-500" : "text-gray-400",
-              )}
-              aria-live="polite"
-            >
-              {remaining} caractère{remaining > 1 ? "s" : ""} restant
-              {remaining > 1 ? "s" : ""}
-            </span>
-          </div>
+          <span
+            className={cn(
+              "text-xs",
+              remaining <= 50 ? "text-red-500" : "text-gray-400",
+            )}
+            aria-live="polite"
+          >
+            {remaining} caractère{remaining > 1 ? "s" : ""} restant
+            {remaining > 1 ? "s" : ""}
+          </span>
           <button
             type="submit"
             disabled={busy || text.trim().length === 0}
@@ -433,6 +427,16 @@ function CommentForm({
             )}
             Publier
           </button>
+        </div>
+
+        <div className="absolute bottom-10 right-3 z-10 -translate-y-1/2 drop-shadow-sm">
+          <EmojiPicker
+            align="end"
+            onSelect={(emoji) =>
+              insertEmojiAtCursor(textareaRef.current, text, emoji, setText)
+            }
+            className="[&>button]:h-7 [&>button]:w-7"
+          />
         </div>
       </div>
     </form>
