@@ -1,9 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/navigation";
-import { Check, ExternalLink, Pencil, Share2, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  ExternalLink,
+  Loader2,
+  Pencil,
+  Share2,
+  Trash2,
+  X,
+} from "lucide-react";
 import type { Note } from "@cinco-wiki/shared";
 import { Avatar } from "@/components/Avatar";
 import { TagBadge } from "@/components/TagBadge";
@@ -12,7 +21,7 @@ import { Spinner } from "@/components/Spinner";
 import { VoteSection } from "@/components/VoteSection";
 import { Lightbox } from "@/components/Lightbox";
 import { CommentsSection } from "@/components/CommentsSection";
-import { api } from "@/lib/api";
+import { api, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { fullName, relativeDate } from "@/lib/format";
 
@@ -33,12 +42,16 @@ function hostOf(url: string): string {
 export function NoteModal({ noteId, onClose }: NoteModalProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { mutate: globalMutate } = useSWRConfig();
   const { data: note, error, isLoading, mutate } = useSWR<Note>(
     noteId ? `note/${noteId}` : null,
     () => api.getNote(noteId),
   );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Synchronise l'URL au montage pour permettre le partage / l'accès direct.
   useEffect(() => {
@@ -60,6 +73,28 @@ export function NoteModal({ noteId, onClose }: NoteModalProps) {
 
   const images = note ? [...note.images].sort((a, b) => a.order - b.order) : [];
   const isAuthor = Boolean(user && note && user.id === note.author.id);
+  const canDelete = Boolean(note && (isAuthor || user?.role === "admin"));
+
+  async function handleDelete() {
+    if (!note) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await api.deleteNote(note.id);
+      // Rafraîchit la liste des notes et les compteurs de tags.
+      await globalMutate(
+        (key) => Array.isArray(key) && (key[0] === "notes" || key[0] === "tags"),
+        undefined,
+        { revalidate: true },
+      );
+      onClose();
+    } catch (err) {
+      setDeleteError(
+        err instanceof ApiClientError ? err.message : "La suppression a échoué. Réessayez.",
+      );
+      setDeleting(false);
+    }
+  }
 
   return (
     <Modal onClose={onClose} size="full">
@@ -116,6 +151,19 @@ export function NoteModal({ noteId, onClose }: NoteModalProps) {
                       >
                         <Pencil className="h-4 w-4" />
                         Modifier
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDeleteError(null);
+                          setConfirmingDelete(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Supprimer
                       </button>
                     )}
                     <button
@@ -226,6 +274,54 @@ export function NoteModal({ noteId, onClose }: NoteModalProps) {
           onClose={() => setLightboxIndex(null)}
           onIndex={setLightboxIndex}
         />
+      )}
+
+      {confirmingDelete && (
+        <Modal
+          title="Supprimer la note"
+          size="sm"
+          onClose={() => {
+            if (!deleting) setConfirmingDelete(false);
+          }}
+        >
+          <div className="space-y-4">
+            <div className="flex gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <AlertTriangle className="h-5 w-5" aria-hidden />
+              </div>
+              <p className="text-sm text-gray-600">
+                Voulez-vous vraiment supprimer cette note ? Les commentaires et votes
+                associés seront aussi supprimés. Cette action est irréversible.
+              </p>
+            </div>
+
+            {deleteError && (
+              <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                {deleteError}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(false)}
+                disabled={deleting}
+                className="rounded-lg px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 disabled:opacity-60"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 disabled:opacity-60"
+              >
+                {deleting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </Modal>
       )}
     </Modal>
   );
