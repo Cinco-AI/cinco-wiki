@@ -6,9 +6,9 @@ import { useAuth } from "@/lib/auth-context";
 import { Spinner } from "@/components/Spinner";
 import { EmptyState } from "@/components/EmptyState";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { UserManagementTable } from "@/components/UserManagementTable";
+import { TagManagementTable } from "@/components/TagManagementTable";
 
-export default function AdminUsersPage() {
+export default function AdminTagsPage() {
   const { loading, isAdmin } = useAuth();
 
   if (loading) {
@@ -47,13 +47,13 @@ export default function AdminUsersPage() {
           items={[
             { label: "Accueil", href: "/" },
             { label: "Administration", href: "/admin" },
-            { label: "Utilisateurs" },
+            { label: "Tags" },
           ]}
         />
-        <h1 className="text-2xl font-bold text-gray-900">Gestion des utilisateurs</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Gestion des tags</h1>
       </header>
 
-      <UserManagementTable />
+      <TagManagementTable />
     </main>
   );
 }

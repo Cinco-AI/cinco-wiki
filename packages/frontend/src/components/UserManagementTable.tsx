@@ -133,16 +133,11 @@ export function UserManagementTable() {
   }
 
   return (
-    <section aria-labelledby="users-heading" className="space-y-5">
+    <section className="space-y-5">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 id="users-heading" className="text-2xl font-bold text-gray-900">
-            Gestion des utilisateurs
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {total} compte{total > 1 ? "s" : ""} au total.
-          </p>
-        </div>
+        <p className="text-sm text-gray-500">
+          {total} compte{total > 1 ? "s" : ""} au total.
+        </p>
         <button
           type="button"
           onClick={() => setModal({ type: "create" })}

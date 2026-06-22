@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { TagBadge } from "@/components/TagBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { Spinner } from "@/components/Spinner";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 /** Nuage de tags (§4) : taille proportionnelle au nombre de notes, cliquable → /tags/:tag. */
 export default function TagsPage() {
@@ -37,6 +38,10 @@ export default function TagsPage() {
       className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8"
     >
       <header className="mb-6">
+        <Breadcrumbs
+          className="mb-2"
+          items={[{ label: "Accueil", href: "/" }, { label: "Tags" }]}
+        />
         <h1 className="text-2xl font-bold text-gray-900">Tags</h1>
         <p className="mt-1 text-sm text-gray-500">
           Explorez les notes par thème. La taille reflète le nombre de notes.
