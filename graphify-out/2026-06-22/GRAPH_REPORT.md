@@ -1,18 +1,12 @@
-# Graph Report - cinco-wiki  (2026-06-22)
+# Graph Report - .  (2026-06-22)
 
 ## Corpus Check
-- 75 files · ~34,247 words
-- Verdict: corpus is large enough that graph structure adds value.
+- Corpus is ~33,230 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 538 nodes · 963 edges · 33 communities (23 shown, 10 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 28 edges (avg confidence: 0.82)
+- 535 nodes · 979 edges · 31 communities (23 shown, 8 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 38 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `84f56fe1`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Backend Core & Auth Layer|Backend Core & Auth Layer]]
@@ -44,8 +38,6 @@
 - [[_COMMUNITY_Root Package JSON|Root Package JSON]]
 - [[_COMMUNITY_Shared Build Excerpt|Shared Build Excerpt]]
 - [[_COMMUNITY_Shared Package JSON|Shared Package JSON]]
-- [[_COMMUNITY_Community 31|Community 31]]
-- [[_COMMUNITY_Community 32|Community 32]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 35 edges
@@ -57,19 +49,19 @@
 7. `compilerOptions` - 14 edges
 8. `Spinner()` - 12 edges
 9. `Backend Entry Point (Hono App)` - 12 edges
-10. `AppEnv` - 11 edges
+10. `UserManagementTable Component` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `TipTap HTML XSS Sanitization` --semantically_similar_to--> `Denormalized Counters Pattern (avgRating, voteCount, commentCount, tagCount)`  [AMBIGUOUS] [semantically similar]
+  packages/backend/src/lib/sanitize.ts → packages/backend/src/lib/db.ts
 - `Frontend Component Contract (CONTRACT_FRONTEND.md)` --references--> `AuthContext and AuthProvider`  [EXTRACTED]
   docs/CONTRACT_FRONTEND.md → packages/frontend/src/lib/auth-context.tsx
-- `NotificationsBell Component` --semantically_similar_to--> `RowActions Sub-component`  [INFERRED] [semantically similar]
-  packages/frontend/src/components/NotificationsBell.tsx → packages/frontend/src/components/UserManagementTable.tsx
-- `Cinco Wiki Functional Specification` --conceptually_related_to--> `Backend API Contract (CONTRACT_API.md)`  [INFERRED]
-  Cinco_Wiki_Spec_Fonctionnelle.md → docs/CONTRACT_API.md
-- `Cinco Wiki Functional Specification` --conceptually_related_to--> `README — Architecture & Deployment Guide`  [INFERRED]
-  Cinco_Wiki_Spec_Fonctionnelle.md → README.md
-- `toNoteCard()` --calls--> `buildExcerpt()`  [INFERRED]
-  packages/backend/src/models/index.ts → packages/shared/src/index.ts
+- `Backend API Contract (CONTRACT_API.md)` --references--> `Shared Package Exports (DTOs, LIMITS, helpers)`  [EXTRACTED]
+  docs/CONTRACT_API.md → packages/shared/src/index.ts
+- `Frontend Component Contract (CONTRACT_FRONTEND.md)` --references--> `Shared Package Exports (DTOs, LIMITS, helpers)`  [EXTRACTED]
+  docs/CONTRACT_FRONTEND.md → packages/shared/src/index.ts
+- `seed-admin.mjs Script` --references--> `Shared Package Exports (DTOs, LIMITS, helpers)`  [INFERRED]
+  scripts/seed-admin.mjs → packages/shared/src/index.ts
 
 ## Import Cycles
 - None detected.
@@ -85,15 +77,15 @@
 - **Auth Session Management: AuthContext + TokenStore + API Client** — lib_authcontext, lib_tokenstore, lib_api [EXTRACTED 1.00]
 - **Tag UI System: TagBadge + TagInput + SearchFilters** — tagbadge_tagbadge, taginput_taginput, searchfilters_searchfilters [INFERRED 0.85]
 
-## Communities (33 total, 10 thin omitted)
+## Communities (31 total, 8 thin omitted)
 
 ### Community 0 - "Backend Core & Auth Layer"
-Cohesion: 0.05
-Nodes (77): Backend Entry Point (Hono App), JWT Access/Refresh Token Rotation Pattern, Soft Author Deletion (null authorId = deleted user), AccessClaims, generateTempPassword(), hashPassword(), RefreshClaims, secret() (+69 more)
+Cohesion: 0.06
+Nodes (74): Backend Entry Point (Hono App), Denormalized Counters Pattern (avgRating, voteCount, commentCount, tagCount), JWT Access/Refresh Token Rotation Pattern, Soft Author Deletion (null authorId = deleted user), AccessClaims, generateTempPassword(), hashPassword(), RefreshClaims (+66 more)
 
 ### Community 1 - "Document Upload Component"
-Cohesion: 0.06
-Nodes (29): DocumentMime, DocumentUploader(), DocumentUploaderProps, formatBytes(), formatBytes(), ImageMime, ImageUploader(), ImageUploaderProps (+21 more)
+Cohesion: 0.05
+Nodes (30): DocumentMime, DocumentUploader(), DocumentUploaderProps, formatBytes(), formatBytes(), ImageMime, ImageUploader(), ImageUploaderProps (+22 more)
 
 ### Community 2 - "Frontend Package Dependencies"
 Cohesion: 0.05
@@ -101,7 +93,7 @@ Nodes (42): dependencies, @cinco-wiki/shared, clsx, date-fns, lucide-react, next
 
 ### Community 3 - "API Contracts & Frontend Patterns"
 Cohesion: 0.09
-Nodes (33): Optimistic UI Update Pattern, Refresh Token Deduplication Pattern, Backend API Contract (CONTRACT_API.md), Frontend Component Contract (CONTRACT_FRONTEND.md), README — Architecture & Deployment Guide, Cinco Wiki Functional Specification, Serverless Framework Config (serverless.yml), buildUrl() (+25 more)
+Nodes (37): Optimistic UI Update Pattern, Refresh Token Deduplication Pattern, Shared Contract — Single Source of Truth for DTOs and Rules, Backend API Contract (CONTRACT_API.md), Frontend Component Contract (CONTRACT_FRONTEND.md), README — Architecture & Deployment Guide, Cinco Wiki Functional Specification, Serverless Framework Config (serverless.yml) (+29 more)
 
 ### Community 4 - "Shared Type System"
 Cohesion: 0.06
@@ -112,8 +104,8 @@ Cohesion: 0.07
 Nodes (27): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+19 more)
 
 ### Community 6 - "Note Content & XSS Sanitization"
-Cohesion: 0.36
-Nodes (7): resolveLinks(), absolutize(), fetchOgPreview(), metaContent(), ogRoutes, querySchema, safeDomain()
+Cohesion: 0.10
+Nodes (16): TipTap HTML XSS Sanitization, htmlToText(), OPTIONS, sanitizeContent(), attachmentSchema, imageSchema, listQuerySchema, noteInputSchema (+8 more)
 
 ### Community 7 - "Root Build & Serverless Config"
 Cohesion: 0.09
@@ -124,28 +116,36 @@ Cohesion: 0.09
 Nodes (21): dependencies, @aws-sdk/client-s3, @aws-sdk/s3-request-presigner, bcryptjs, cheerio, @cinco-wiki/shared, hono, jose (+13 more)
 
 ### Community 9 - "Search, Filters & Tag UI"
-Cohesion: 0.13
-Nodes (16): RootLayout, CommentForm(), Modal(), ModalProps, SIZE, CreateUserModal(), MenuItem(), ModalActions() (+8 more)
+Cohesion: 0.14
+Nodes (15): CommentForm(), SearchFilters(), SearchFiltersProps, SORT_OPTIONS, TagBadge(), TagBadgeProps, CreateUserModal(), MenuItem() (+7 more)
 
 ### Community 10 - "Modal & Overlay Layer"
-Cohesion: 0.19
-Nodes (7): Lightbox(), LightboxProps, NoteModalProps, VoteSection(), VoteSectionProps, api, ApiClientError
+Cohesion: 0.13
+Nodes (13): RootLayout, Lightbox(), LightboxProps, Modal(), ModalProps, SIZE, NoteModalProps, VoteSection() (+5 more)
+
+### Community 11 - "App Shell & Navigation"
+Cohesion: 0.17
+Nodes (10): AppLayout(), metadata, CommentsSection(), NavBar(), tokenStore, AuthContext, AuthProvider(), AuthState (+2 more)
 
 ### Community 12 - "User Avatar & Comments UI"
-Cohesion: 0.15
-Nodes (18): Avatar(), AvatarProps, SIZE, CommentForm Component, CommentItem Component, CommentItem(), NavBar(), NoteCard() (+10 more)
+Cohesion: 0.19
+Nodes (14): Avatar(), AvatarProps, SIZE, CommentForm Component, CommentItem Component, CommentItem(), NoteModal(), DeleteUserModal() (+6 more)
 
 ### Community 13 - "Admin UI & Loading States"
-Cohesion: 0.15
-Nodes (16): AdminPage(), AppLayout(), CommentsSection(), EmptyState(), EmptyStateProps, SIZE, Spinner(), SpinnerProps (+8 more)
+Cohesion: 0.19
+Nodes (10): AdminPage(), EmptyState(), EmptyStateProps, SIZE, Spinner(), SpinnerProps, UserManagementTable(), Tag Cloud with Proportional Sizing (+2 more)
 
 ### Community 14 - "Base TypeScript Config"
 Cohesion: 0.12
 Nodes (15): compilerOptions, declaration, esModuleInterop, forceConsistentCasingInFileNames, isolatedModules, lib, module, moduleResolution (+7 more)
 
+### Community 15 - "Home Feed & Dashboard"
+Cohesion: 0.21
+Nodes (5): HomePage, NotesDashboard(), NotesDashboardProps, Keyset/Cursor Pagination (base64url encoded cursor), TagPage
+
 ### Community 16 - "Note Card & Notifications"
-Cohesion: 0.15
-Nodes (13): HomePage, NoteCardProps, NotesDashboardProps, SearchFilters(), SearchFiltersProps, SORT_OPTIONS, SIZE, Stars() (+5 more)
+Cohesion: 0.27
+Nodes (8): NoteCard(), NoteCardProps, NotificationsBell(), SIZE, Stars(), StarsProps, relativeDate(), roundHalf()
 
 ### Community 17 - "Shared Package Manifest"
 Cohesion: 0.20
@@ -163,33 +163,29 @@ Nodes (6): __dirname, generatePassword(), loadDotEnv(), main(), parseArgs(), REP
 Cohesion: 0.50
 Nodes (4): Admin Dashboard Page, Admin Users Management Page, App Layout (auth guard + NavBar), Note Detail Page ([id]/page.tsx)
 
-### Community 29 - "Shared Build Excerpt"
-Cohesion: 0.20
-Nodes (8): Architecture, Backend, Code exploration, Commands, Frontend, Infrastructure, Key Invariants, Shared package — the contract
-
-### Community 31 - "Community 31"
-Cohesion: 0.40
-Nodes (4): TipTap HTML XSS Sanitization, htmlToText(), OPTIONS, sanitizeContent()
+## Ambiguous Edges - Review These
+- `Denormalized Counters Pattern (avgRating, voteCount, commentCount, tagCount)` → `TipTap HTML XSS Sanitization`  [AMBIGUOUS]
+  packages/backend/src/lib/sanitize.ts · relation: semantically_similar_to
 
 ## Knowledge Gaps
-- **255 isolated node(s):** `Code exploration`, `Commands`, `Shared package — the contract`, `Backend`, `Frontend` (+250 more)
+- **249 isolated node(s):** `allow`, `name`, `version`, `private`, `description` (+244 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **What is the exact relationship between `Denormalized Counters Pattern (avgRating, voteCount, commentCount, tagCount)` and `TipTap HTML XSS Sanitization`?**
+  _Edge tagged AMBIGUOUS (relation: semantically_similar_to) - confidence is low._
+- **Why does `Keyset/Cursor Pagination (base64url encoded cursor)` connect `Home Feed & Dashboard` to `Document Upload Component`, `Note Content & XSS Sanitization`?**
+  _High betweenness centrality (0.167) - this node is a cross-community bridge._
 - **Why does `normalizeTag()` connect `Document Upload Component` to `Shared Type System`?**
-  _High betweenness centrality (0.222) - this node is a cross-community bridge._
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
 - **Why does `TagInput()` connect `Document Upload Component` to `Search, Filters & Tag UI`?**
-  _High betweenness centrality (0.213) - this node is a cross-community bridge._
-- **Why does `normalizeTags()` connect `Document Upload Component` to `Backend Core & Auth Layer`?**
-  _High betweenness centrality (0.169) - this node is a cross-community bridge._
-- **What connects `Code exploration`, `Commands`, `Shared package — the contract` to the rest of the system?**
-  _258 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **What connects `allow`, `name`, `version` to the rest of the system?**
+  _251 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Backend Core & Auth Layer` be split into smaller, more focused modules?**
-  _Cohesion score 0.05054945054945055 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.056886898096304594 - nodes in this community are weakly interconnected._
 - **Should `Document Upload Component` be split into smaller, more focused modules?**
-  _Cohesion score 0.05603864734299517 - nodes in this community are weakly interconnected._
-- **Should `Frontend Package Dependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.046511627906976744 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0545790934320074 - nodes in this community are weakly interconnected._
