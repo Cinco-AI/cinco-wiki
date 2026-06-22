@@ -102,9 +102,20 @@ export function NoteCard({ note, onOpen }: NoteCardProps) {
           <p className="line-clamp-3 text-sm text-gray-500">{note.excerpt}</p>
         )}
 
-        {/* Aperçu du premier lien */}
+        {/* Aperçu du premier lien — cliquable, ouvre dans un nouvel onglet */}
         {note.firstLink && (
-          <div className="flex items-center gap-2 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 p-2">
+          <a
+            href={note.firstLink.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            title={note.firstLink.title ?? note.firstLink.url}
+            className={cn(
+              "relative z-10 flex items-center gap-2 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 p-2 transition",
+              "hover:border-brand-200 hover:bg-brand-50",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200",
+            )}
+          >
             {note.firstLink.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -128,7 +139,7 @@ export function NoteCard({ note, onOpen }: NoteCardProps) {
                 </span>
               )}
             </span>
-          </div>
+          </a>
         )}
 
         {/* Pied : auteur + métriques */}
