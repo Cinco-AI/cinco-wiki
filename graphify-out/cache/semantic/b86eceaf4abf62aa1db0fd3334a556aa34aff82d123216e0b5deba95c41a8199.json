@@ -1,0 +1,1 @@
+{"nodes": [{"id": "routes_uploads", "label": "Uploads Routes (/uploads)", "file_type": "code", "source_file": "packages/backend/src/routes/uploads.ts", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}

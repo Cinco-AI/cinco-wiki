@@ -6,12 +6,16 @@ import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Check,
+  Download,
   ExternalLink,
+  FileArchive,
+  FileSpreadsheet,
+  FileText,
+  File as FileIcon,
   Loader2,
   Pencil,
   Share2,
   Trash2,
-  X,
 } from "lucide-react";
 import type { Note } from "@cinco-wiki/shared";
 import { Avatar } from "@/components/Avatar";
@@ -36,6 +40,23 @@ function hostOf(url: string): string {
   } catch {
     return url;
   }
+}
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} o`;
+  const kb = n / 1024;
+  if (kb < 1024) return `${kb < 10 ? kb.toFixed(1) : Math.round(kb)} Ko`;
+  const mb = kb / 1024;
+  return `${mb < 10 ? mb.toFixed(1) : Math.round(mb)} Mo`;
+}
+
+/** Icône en fonction du type MIME du document. */
+function attachmentIcon(type: string) {
+  if (type.includes("spreadsheet") || type === "application/vnd.ms-excel" || type === "text/csv")
+    return FileSpreadsheet;
+  if (type.includes("zip")) return FileArchive;
+  if (type === "application/pdf" || type.startsWith("text/")) return FileText;
+  return FileIcon;
 }
 
 /** Détail d'une note en modale large/plein écran, partageable par URL (§5.2, §8). */
@@ -97,18 +118,8 @@ export function NoteModal({ noteId, onClose }: NoteModalProps) {
   }
 
   return (
-    <Modal onClose={onClose} size="full">
-      <div className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl animate-scale-in">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Fermer"
-          className="absolute right-4 top-4 z-10 rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-200"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
-        <div className="scrollbar-thin overflow-y-auto px-6 py-6 sm:px-8">
+    <Modal onClose={onClose} size="xl">
+        <div className="px-6 py-6 sm:px-8">
           {isLoading && (
             <div className="flex min-h-[40vh] items-center justify-center">
               <Spinner />
@@ -218,6 +229,35 @@ export function NoteModal({ noteId, onClose }: NoteModalProps) {
                 </div>
               )}
 
+              {note.attachments?.length > 0 && (
+                <div className="space-y-2">
+                  {note.attachments.map((file, i) => {
+                    const Icon = attachmentIcon(file.contentType);
+                    return (
+                      <a
+                        key={`${file.url}-${i}`}
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-2.5 transition hover:border-brand-400 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600">
+                          <Icon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium text-gray-900">{file.name}</p>
+                          <p className="text-xs text-gray-500">{formatBytes(file.size)}</p>
+                        </div>
+                        <Download
+                          className="h-4 w-4 shrink-0 text-gray-400 transition group-hover:text-brand-600"
+                          aria-hidden="true"
+                        />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+
               {note.links.length > 0 && (
                 <div className="space-y-2">
                   {note.links.map((link) => (
@@ -265,7 +305,6 @@ export function NoteModal({ noteId, onClose }: NoteModalProps) {
             </article>
           )}
         </div>
-      </div>
 
       {lightboxIndex !== null && images.length > 0 && (
         <Lightbox

@@ -109,7 +109,7 @@ export function NotesDashboard({ openNoteId, initialTag }: NotesDashboardProps) 
         <>
           <div
             aria-busy={isValidating}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-10"
           >
             {items.map((note) => (
               <NoteCard key={note.id} note={note} onOpen={(id) => router.push(`/${id}`)} />

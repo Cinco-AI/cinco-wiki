@@ -7,6 +7,7 @@ import { AlertCircle, Check, Loader2, Save, Send } from "lucide-react";
 import {
   LIMITS,
   type Note,
+  type NoteAttachment,
   type NoteImage,
   type NoteInput,
   type NoteStatus,
@@ -15,6 +16,7 @@ import { api, ApiClientError } from "@/lib/api";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { LinkManager } from "@/components/LinkManager";
 import { ImageUploader } from "@/components/ImageUploader";
+import { DocumentUploader } from "@/components/DocumentUploader";
 import { TagInput } from "@/components/TagInput";
 import { Spinner } from "@/components/Spinner";
 
@@ -31,9 +33,10 @@ function serialize(
   html: string,
   tags: string[],
   images: NoteImage[],
+  attachments: NoteAttachment[],
   links: string[],
 ): string {
-  return JSON.stringify({ title: title.trim(), html, tags, images, links });
+  return JSON.stringify({ title: title.trim(), html, tags, images, attachments, links });
 }
 
 /**
@@ -58,9 +61,10 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
   const [contentHtml, setContentHtml] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [images, setImages] = useState<NoteImage[]>([]);
+  const [attachments, setAttachments] = useState<NoteAttachment[]>([]);
   const [links, setLinks] = useState<string[]>([]);
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(
-    mode === "create" ? serialize("", "", [], [], []) : null,
+    mode === "create" ? serialize("", "", [], [], [], []) : null,
   );
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [submitting, setSubmitting] = useState(false);
@@ -76,6 +80,7 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
     setContentHtml(loaded.contentHtml);
     setTags(loaded.tags);
     setImages(loaded.images);
+    setAttachments(loaded.attachments ?? []);
     setLinks(loaded.links.map((l) => l.url));
     statusRef.current = loaded.status;
     idRef.current = loaded.id;
@@ -84,19 +89,20 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
       loaded.contentHtml,
       loaded.tags,
       loaded.images,
+      loaded.attachments ?? [],
       loaded.links.map((l) => l.url),
     );
     setSavedSnapshot(snap);
     savedRef.current = snap;
   }, [loaded]);
 
-  const currentSnapshot = serialize(title, contentHtml, tags, images, links);
+  const currentSnapshot = serialize(title, contentHtml, tags, images, attachments, links);
   const dirty = savedSnapshot !== null && currentSnapshot !== savedSnapshot;
   const hasTitle = title.trim().length > 0;
 
   // Refs synchronisées pour l'autosave (évite les closures périmées).
-  const formRef = useRef({ title, contentHtml, tags, images, links });
-  formRef.current = { title, contentHtml, tags, images, links };
+  const formRef = useRef({ title, contentHtml, tags, images, attachments, links });
+  formRef.current = { title, contentHtml, tags, images, attachments, links };
   savedRef.current = savedSnapshot;
 
   const save = useCallback(
@@ -112,6 +118,7 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
         contentHtml: f.contentHtml,
         tags: f.tags,
         images: f.images,
+        attachments: f.attachments,
         links: f.links,
         status,
       };
@@ -128,6 +135,7 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
           note.contentHtml,
           note.tags,
           note.images,
+          note.attachments ?? [],
           note.links.map((l) => l.url),
         );
         setSavedSnapshot(snap);
@@ -150,7 +158,7 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
       const f = formRef.current;
       if (!f.title.trim()) return;
       if (savedRef.current === null) return; // pas encore initialisé (édition)
-      const snap = serialize(f.title, f.contentHtml, f.tags, f.images, f.links);
+      const snap = serialize(f.title, f.contentHtml, f.tags, f.images, f.attachments, f.links);
       if (snap === savedRef.current) return; // rien à enregistrer
       void save(statusRef.current, false);
     }, LIMITS.autosaveMs);
@@ -279,6 +287,11 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Images</label>
           <ImageUploader images={images} onChange={setImages} />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Documents</label>
+          <DocumentUploader attachments={attachments} onChange={setAttachments} />
         </div>
 
         <div>

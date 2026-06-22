@@ -2,7 +2,13 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { IMAGE_MIME, LIMITS, type PresignUploadResult } from "@cinco-wiki/shared";
+import {
+  DOCUMENT_MIME,
+  IMAGE_MIME,
+  LIMITS,
+  UPLOAD_MIME,
+  type PresignUploadResult,
+} from "@cinco-wiki/shared";
 import { body, errors, type AppEnv } from "../lib/http.js";
 import { env } from "../lib/env.js";
 
@@ -20,7 +26,7 @@ function getS3(): S3Client {
 
 const presignSchema = z.object({
   filename: z.string().min(1).max(255),
-  contentType: z.enum([...IMAGE_MIME]),
+  contentType: z.enum([...UPLOAD_MIME]),
   size: z.number().int().positive(),
 });
 
@@ -35,13 +41,15 @@ function safeFilename(filename: string): string {
 uploadsRoutes.post("/presign", async (c) => {
   const { filename, contentType, size } = await body(c, presignSchema);
 
-  if (!IMAGE_MIME.includes(contentType)) {
-    throw errors.badRequest("Type d'image non autorisé");
+  const isImage = (IMAGE_MIME as readonly string[]).includes(contentType);
+  const isDocument = (DOCUMENT_MIME as readonly string[]).includes(contentType);
+  if (!isImage && !isDocument) {
+    throw errors.badRequest("Type de fichier non autorisé");
   }
-  if (size > LIMITS.imageMaxBytes) {
-    throw errors.badRequest(
-      `Fichier trop volumineux (max ${LIMITS.imageMaxBytes} octets)`,
-    );
+
+  const maxBytes = isImage ? LIMITS.imageMaxBytes : LIMITS.attachmentMaxBytes;
+  if (size > maxBytes) {
+    throw errors.badRequest(`Fichier trop volumineux (max ${maxBytes} octets)`);
   }
 
   const userId = c.get("userId");

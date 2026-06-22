@@ -13,6 +13,8 @@ export const LIMITS = {
   tagsPerNote: 10,
   imagesPerNote: 10,
   imageMaxBytes: 5 * 1024 * 1024,
+  attachmentsPerNote: 10,
+  attachmentMaxBytes: 20 * 1024 * 1024,
   linksPerNote: 5,
   cardExcerptChars: 150,
   voteMin: 1,
@@ -23,6 +25,24 @@ export const LIMITS = {
 } as const;
 
 export const IMAGE_MIME = ["image/jpeg", "image/png", "image/gif", "image/webp"] as const;
+
+/** Types de documents acceptés en pièce jointe (bureautique + archives). */
+export const DOCUMENT_MIME = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "text/csv",
+  "application/zip",
+  "application/x-zip-compressed",
+] as const;
+
+/** Ensemble des types acceptés par l'endpoint de pré-signature. */
+export const UPLOAD_MIME = [...IMAGE_MIME, ...DOCUMENT_MIME] as const;
 
 // ---------------------------------------------------------------------------
 // Énumérations
@@ -75,6 +95,17 @@ export interface NoteImage {
   height?: number;
 }
 
+/** Pièce jointe non-image (PDF, document bureautique, archive…). */
+export interface NoteAttachment {
+  url: string;
+  /** Nom de fichier d'origine — affiché et utilisé au téléchargement. */
+  name: string;
+  /** Taille en octets. */
+  size: number;
+  /** Type MIME — sert à choisir l'icône d'affichage. */
+  contentType: string;
+}
+
 export interface LinkPreview {
   url: string;
   title: string | null;
@@ -93,6 +124,7 @@ export interface Note {
   author: UserPublic;
   tags: string[];
   images: NoteImage[];
+  attachments: NoteAttachment[];
   links: LinkPreview[];
   status: NoteStatus;
   avgRating: number;
@@ -203,6 +235,7 @@ export interface NoteInput {
   contentHtml: string;
   tags: string[];
   images: NoteImage[];
+  attachments: NoteAttachment[];
   /** URLs brutes — le backend résout les métadonnées Open Graph. */
   links: string[];
   status: NoteStatus;
@@ -230,7 +263,7 @@ export interface NoteQuery {
 
 export interface PresignUploadInput {
   filename: string;
-  contentType: (typeof IMAGE_MIME)[number];
+  contentType: (typeof UPLOAD_MIME)[number];
   size: number;
 }
 

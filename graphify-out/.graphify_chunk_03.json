@@ -1,0 +1,1170 @@
+{
+  "nodes": [
+    {
+      "id": "notificationsbell_notificationsbell",
+      "label": "NotificationsBell Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 14",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "richtexteditor_richtexteditor",
+      "label": "RichTextEditor Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/RichTextEditor.tsx",
+      "source_location": "line 137",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "richtexteditor_toolbarbutton",
+      "label": "ToolbarButton Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/RichTextEditor.tsx",
+      "source_location": "line 54",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "richtexteditor_colorbutton",
+      "label": "ColorButton Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/RichTextEditor.tsx",
+      "source_location": "line 90",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "searchfilters_searchfilters",
+      "label": "SearchFilters Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx",
+      "source_location": "line 40",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "spinner_spinner",
+      "label": "Spinner Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/Spinner.tsx",
+      "source_location": "line 18",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "stars_stars",
+      "label": "Stars Rating Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/Stars.tsx",
+      "source_location": "line 28",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "tagbadge_tagbadge",
+      "label": "TagBadge Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/TagBadge.tsx",
+      "source_location": "line 12",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "taginput_taginput",
+      "label": "TagInput Combobox Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": "line 27",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usermanagementtable_usermanagementtable",
+      "label": "UserManagementTable Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 74",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usermanagementtable_createusermodal",
+      "label": "CreateUserModal Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 574",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usermanagementtable_editusermodal",
+      "label": "EditUserModal Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 703",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usermanagementtable_deleteusermodal",
+      "label": "DeleteUserModal Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 814",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usermanagementtable_temppasswordmodal",
+      "label": "TempPasswordModal Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 874",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usermanagementtable_rowactions",
+      "label": "RowActions Sub-component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 376",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "votesection_votesection",
+      "label": "VoteSection Component",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/components/VoteSection.tsx",
+      "source_location": "line 15",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_api",
+      "label": "Frontend API Client (api.ts)",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 145",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_apiclienterror",
+      "label": "ApiClientError Class",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 33",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_tokenstore",
+      "label": "tokenStore (Token Persistence)",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 47",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_authcontext",
+      "label": "AuthContext and AuthProvider",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/auth-context.tsx",
+      "source_location": "line 26",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_useauth",
+      "label": "useAuth Hook",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/auth-context.tsx",
+      "source_location": "line 65",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_cn",
+      "label": "cn Utility (clsx wrapper)",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/cn.ts",
+      "source_location": "line 4",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "lib_format",
+      "label": "Format Utilities (relativeDate, fullName, initials, roundHalf)",
+      "file_type": "code",
+      "source_file": "packages/frontend/src/lib/format.ts",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_tailwindconfig",
+      "label": "Tailwind Config (brand palette + animations)",
+      "file_type": "code",
+      "source_file": "packages/frontend/tailwind.config.ts",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_tsconfig",
+      "label": "Frontend TypeScript Config",
+      "file_type": "code",
+      "source_file": "packages/frontend/tsconfig.json",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shared_index",
+      "label": "Shared Package Exports (DTOs, LIMITS, helpers)",
+      "file_type": "code",
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shared_limits",
+      "label": "LIMITS Business Rules Constants",
+      "file_type": "code",
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": "line 10",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shared_normalizetag",
+      "label": "normalizeTag Helper",
+      "file_type": "code",
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": "line 297",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shared_buildexcerpt",
+      "label": "buildExcerpt Helper",
+      "file_type": "code",
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": "line 302",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shared_packagejson",
+      "label": "Shared Package Manifest",
+      "file_type": "code",
+      "source_file": "packages/shared/package.json",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shared_tsconfig",
+      "label": "Shared Package TypeScript Config",
+      "file_type": "code",
+      "source_file": "packages/shared/tsconfig.json",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "scripts_seedadmin",
+      "label": "seed-admin.mjs Script",
+      "file_type": "code",
+      "source_file": "scripts/seed-admin.mjs",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_tsconfigbase",
+      "label": "Root tsconfig.base.json",
+      "file_type": "code",
+      "source_file": "tsconfig.base.json",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_spec",
+      "label": "Cinco Wiki Functional Specification",
+      "file_type": "document",
+      "source_file": "Cinco_Wiki_Spec_Fonctionnelle.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_readme",
+      "label": "README — Architecture & Deployment Guide",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_contractapi",
+      "label": "Backend API Contract (CONTRACT_API.md)",
+      "file_type": "document",
+      "source_file": "docs/CONTRACT_API.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_contractfrontend",
+      "label": "Frontend Component Contract (CONTRACT_FRONTEND.md)",
+      "file_type": "document",
+      "source_file": "docs/CONTRACT_FRONTEND.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "infra_serverless",
+      "label": "Serverless Framework Config (serverless.yml)",
+      "file_type": "code",
+      "source_file": "serverless.yml",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_optimisticupdate",
+      "label": "Optimistic UI Update Pattern",
+      "file_type": "rationale",
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 49",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_refreshtokendedup",
+      "label": "Refresh Token Deduplication Pattern",
+      "file_type": "rationale",
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 87",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_sharedcontract",
+      "label": "Shared Contract — Single Source of Truth for DTOs and Rules",
+      "file_type": "rationale",
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 8",
+      "weight": 1.0
+    },
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "lib_format",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 9",
+      "weight": 1.0
+    },
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 10",
+      "weight": 1.0
+    },
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "spinner_spinner",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 11",
+      "weight": 1.0
+    },
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 7",
+      "weight": 1.0
+    },
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "concept_optimisticupdate",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": "line 49",
+      "weight": 0.9
+    },
+    {
+      "source": "richtexteditor_richtexteditor",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/RichTextEditor.tsx",
+      "source_location": "line 46",
+      "weight": 1.0
+    },
+    {
+      "source": "richtexteditor_richtexteditor",
+      "target": "richtexteditor_toolbarbutton",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/RichTextEditor.tsx",
+      "source_location": "line 220",
+      "weight": 1.0
+    },
+    {
+      "source": "richtexteditor_richtexteditor",
+      "target": "richtexteditor_colorbutton",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/RichTextEditor.tsx",
+      "source_location": "line 382",
+      "weight": 1.0
+    },
+    {
+      "source": "searchfilters_searchfilters",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx",
+      "source_location": "line 21",
+      "weight": 1.0
+    },
+    {
+      "source": "searchfilters_searchfilters",
+      "target": "tagbadge_tagbadge",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx",
+      "source_location": "line 19",
+      "weight": 1.0
+    },
+    {
+      "source": "searchfilters_searchfilters",
+      "target": "lib_format",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx",
+      "source_location": "line 20",
+      "weight": 1.0
+    },
+    {
+      "source": "searchfilters_searchfilters",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx",
+      "source_location": "line 12",
+      "weight": 1.0
+    },
+    {
+      "source": "searchfilters_searchfilters",
+      "target": "shared_limits",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx",
+      "source_location": "line 63",
+      "weight": 1.0
+    },
+    {
+      "source": "spinner_spinner",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/Spinner.tsx",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "stars_stars",
+      "target": "lib_format",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/Stars.tsx",
+      "source_location": "line 5",
+      "weight": 1.0
+    },
+    {
+      "source": "stars_stars",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/Stars.tsx",
+      "source_location": "line 6",
+      "weight": 1.0
+    },
+    {
+      "source": "tagbadge_tagbadge",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/TagBadge.tsx",
+      "source_location": "line 3",
+      "weight": 1.0
+    },
+    {
+      "source": "taginput_taginput",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": "line 7",
+      "weight": 1.0
+    },
+    {
+      "source": "taginput_taginput",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": "line 8",
+      "weight": 1.0
+    },
+    {
+      "source": "taginput_taginput",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": "line 6",
+      "weight": 1.0
+    },
+    {
+      "source": "taginput_taginput",
+      "target": "shared_normalizetag",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": "line 6",
+      "weight": 1.0
+    },
+    {
+      "source": "taginput_taginput",
+      "target": "shared_limits",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": "line 6",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 33",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "lib_apiclienterror",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 33",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "lib_useauth",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 34",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "lib_format",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 35",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 36",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "spinner_spinner",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 38",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "usermanagementtable_createusermodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 299",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "usermanagementtable_editusermodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 307",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "usermanagementtable_deleteusermodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 317",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "usermanagementtable_temppasswordmodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 327",
+      "weight": 1.0
+    },
+    {
+      "source": "usermanagementtable_usermanagementtable",
+      "target": "usermanagementtable_rowactions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/UserManagementTable.tsx",
+      "source_location": "line 245",
+      "weight": 1.0
+    },
+    {
+      "source": "votesection_votesection",
+      "target": "stars_stars",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/VoteSection.tsx",
+      "source_location": "line 6",
+      "weight": 1.0
+    },
+    {
+      "source": "votesection_votesection",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/VoteSection.tsx",
+      "source_location": "line 7",
+      "weight": 1.0
+    },
+    {
+      "source": "votesection_votesection",
+      "target": "lib_apiclienterror",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/VoteSection.tsx",
+      "source_location": "line 7",
+      "weight": 1.0
+    },
+    {
+      "source": "votesection_votesection",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/components/VoteSection.tsx",
+      "source_location": "line 5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_api",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_api",
+      "target": "lib_tokenstore",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 47",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_api",
+      "target": "lib_apiclienterror",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 33",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_api",
+      "target": "concept_refreshtokendedup",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "packages/frontend/src/lib/api.ts",
+      "source_location": "line 87",
+      "weight": 0.9
+    },
+    {
+      "source": "lib_authcontext",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/auth-context.tsx",
+      "source_location": "line 13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_authcontext",
+      "target": "lib_tokenstore",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/auth-context.tsx",
+      "source_location": "line 13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_authcontext",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/auth-context.tsx",
+      "source_location": "line 12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_useauth",
+      "target": "lib_authcontext",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/auth-context.tsx",
+      "source_location": "line 65",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_format",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "packages/frontend/src/lib/format.ts",
+      "source_location": "line 17",
+      "weight": 0.8
+    },
+    {
+      "source": "shared_tsconfig",
+      "target": "root_tsconfigbase",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/shared/tsconfig.json",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_tsconfig",
+      "target": "root_tsconfigbase",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "packages/frontend/tsconfig.json",
+      "source_location": null,
+      "weight": 0.7
+    },
+    {
+      "source": "scripts_seedadmin",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "scripts/seed-admin.mjs",
+      "source_location": "line 130",
+      "weight": 0.7
+    },
+    {
+      "source": "docs_contractapi",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_API.md",
+      "source_location": "line 3",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_contractapi",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_API.md",
+      "source_location": "line 4",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_contractfrontend",
+      "target": "lib_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_FRONTEND.md",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_contractfrontend",
+      "target": "lib_authcontext",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_FRONTEND.md",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_contractfrontend",
+      "target": "lib_format",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_FRONTEND.md",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_contractfrontend",
+      "target": "lib_cn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_FRONTEND.md",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_contractfrontend",
+      "target": "shared_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_FRONTEND.md",
+      "source_location": "line 2",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_readme",
+      "target": "infra_serverless",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 25",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_readme",
+      "target": "docs_contractapi",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_readme",
+      "target": "docs_contractfrontend",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 27",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_spec",
+      "target": "docs_contractapi",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/CONTRACT_API.md",
+      "source_location": null,
+      "weight": 0.8
+    },
+    {
+      "source": "concept_sharedcontract",
+      "target": "shared_index",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": "line 1",
+      "weight": 0.9
+    },
+    {
+      "source": "concept_sharedcontract",
+      "target": "lib_api",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "packages/shared/src/index.ts",
+      "source_location": null,
+      "weight": 0.8
+    },
+    {
+      "source": "tagbadge_tagbadge",
+      "target": "taginput_taginput",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "packages/frontend/src/components/TagInput.tsx",
+      "source_location": null,
+      "weight": 0.7
+    },
+    {
+      "source": "notificationsbell_notificationsbell",
+      "target": "usermanagementtable_rowactions",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "packages/frontend/src/components/NotificationsBell.tsx",
+      "source_location": null,
+      "weight": 0.6
+    },
+    {
+      "source": "docs_spec",
+      "target": "docs_readme",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "README.md",
+      "source_location": "line 4",
+      "weight": 0.8
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "shared_contract_trio",
+      "label": "Shared Contract as Single Source of Truth for Frontend, Backend and Docs",
+      "nodes": [
+        "shared_index",
+        "lib_api",
+        "docs_contractapi"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CONTRACT_API.md"
+    },
+    {
+      "id": "auth_session_flow",
+      "label": "Auth Session Management: AuthContext + TokenStore + API Client",
+      "nodes": [
+        "lib_authcontext",
+        "lib_tokenstore",
+        "lib_api"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend/src/lib/auth-context.tsx"
+    },
+    {
+      "id": "tag_system_ui",
+      "label": "Tag UI System: TagBadge + TagInput + SearchFilters",
+      "nodes": [
+        "tagbadge_tagbadge",
+        "taginput_taginput",
+        "searchfilters_searchfilters"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "packages/frontend/src/components/SearchFilters.tsx"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

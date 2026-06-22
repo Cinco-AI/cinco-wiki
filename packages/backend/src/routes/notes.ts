@@ -29,11 +29,19 @@ const imageSchema = z.object({
   height: z.number().int().positive().optional(),
 });
 
+const attachmentSchema = z.object({
+  url: z.string().url(),
+  name: z.string().min(1).max(255),
+  size: z.number().int().nonnegative(),
+  contentType: z.string().min(1).max(255),
+});
+
 const noteInputSchema = z.object({
   title: z.string().trim().min(1).max(LIMITS.noteTitleMax),
   contentHtml: z.string(),
   tags: z.array(z.string()),
   images: z.array(imageSchema),
+  attachments: z.array(attachmentSchema),
   links: z.array(z.string().url()),
   status: z.enum(["published", "draft"]),
 });
@@ -280,10 +288,14 @@ notesRoutes.post("/", async (c) => {
   if (input.images.length > LIMITS.imagesPerNote) {
     throw errors.badRequest(`Maximum ${LIMITS.imagesPerNote} images par note`);
   }
+  if (input.attachments.length > LIMITS.attachmentsPerNote) {
+    throw errors.badRequest(`Maximum ${LIMITS.attachmentsPerNote} documents par note`);
+  }
 
   const tags = normalizeTags(input.tags);
   const links = await resolveLinks(input.links);
   const images = [...input.images].sort((a, b) => a.order - b.order);
+  const attachments = input.attachments;
   const contentHtml = sanitizeContent(input.contentHtml);
   const contentText = htmlToText(contentHtml);
 
@@ -296,6 +308,7 @@ notesRoutes.post("/", async (c) => {
     authorId: meId,
     tags,
     images,
+    attachments,
     links,
     status: input.status,
     avgRating: 0,
@@ -330,10 +343,14 @@ notesRoutes.put("/:id", async (c) => {
   if (input.images.length > LIMITS.imagesPerNote) {
     throw errors.badRequest(`Maximum ${LIMITS.imagesPerNote} images par note`);
   }
+  if (input.attachments.length > LIMITS.attachmentsPerNote) {
+    throw errors.badRequest(`Maximum ${LIMITS.attachmentsPerNote} documents par note`);
+  }
 
   const tags = normalizeTags(input.tags);
   const links = await resolveLinks(input.links);
   const images = [...input.images].sort((a, b) => a.order - b.order);
+  const attachments = input.attachments;
   const contentHtml = sanitizeContent(input.contentHtml);
   const contentText = htmlToText(contentHtml);
   const now = new Date();
@@ -347,6 +364,7 @@ notesRoutes.put("/:id", async (c) => {
         contentText,
         tags,
         images,
+        attachments,
         links,
         status: input.status,
         updatedAt: now,
@@ -367,6 +385,7 @@ notesRoutes.put("/:id", async (c) => {
     contentText,
     tags,
     images,
+    attachments,
     links,
     status: input.status,
     updatedAt: now,

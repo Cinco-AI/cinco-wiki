@@ -60,6 +60,7 @@ export function toNote(doc: NoteDoc, author: UserPublic, myVote: number | null):
     author,
     tags: doc.tags,
     images: doc.images,
+    attachments: doc.attachments ?? [],
     links: doc.links,
     status: doc.status,
     avgRating: doc.avgRating,

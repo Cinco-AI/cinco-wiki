@@ -1,6 +1,7 @@
 import { MongoClient, type Db, type Collection, type ObjectId } from "mongodb";
 import type {
   LinkPreview,
+  NoteAttachment,
   NoteImage,
   NoteStatus,
   NotificationType,
@@ -37,6 +38,7 @@ export interface NoteDoc {
   authorId: ObjectId | null; // null => « Utilisateur supprimé »
   tags: string[];
   images: NoteImage[];
+  attachments: NoteAttachment[];
   links: LinkPreview[];
   status: NoteStatus;
   // Compteurs dénormalisés (recalculés à chaque vote/commentaire).
