@@ -24,10 +24,9 @@ interface NotesDashboardProps {
 export function NotesDashboard({ openNoteId, initialTag }: NotesDashboardProps) {
   const router = useRouter();
 
-  // Filtre courant. Par défaut « Mes notes » sur le tableau de bord nu
-  // (ni tag ni note ouverte), sinon vue globale.
+  // Filtre courant. Vue globale par défaut (toutes les notes publiées) ;
+  // « Mes notes » est une bascule explicite dans SearchFilters.
   const [query, setQuery] = useState<NoteQuery>(() => ({
-    mine: !initialTag && !openNoteId,
     tags: initialTag ? [initialTag] : undefined,
     sort: "recent",
   }));
