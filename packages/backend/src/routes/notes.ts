@@ -12,9 +12,9 @@ import { LIMITS, normalizeTag } from "@cinco-wiki/shared";
 import { collections, type NoteDoc } from "../lib/db.js";
 import { body, errors, oid, type AppEnv } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";
-import { sanitizeContent, htmlToText } from "../lib/sanitize.js";
+import { sanitizeContent } from "../lib/sanitize.js";
 import { toNote, toNoteCard } from "../models/index.js";
-import { composeContentText, preserveContentTextPrefix } from "../lib/content-text.js";
+import { composeContentHtml, preserveContentHtmlPrefix } from "../lib/content-html.js";
 import { summarizeExternalLink } from "../lib/link-summarizer-client.js";
 import { createNotification } from "../routes/notifications.js";
 import { fetchOgPreview } from "../routes/og.js";
@@ -202,7 +202,7 @@ notesRoutes.get("/", async (c) => {
   // Recherche plein texte (titre + texte brut), regex insensible à la casse.
   if (parsed.q) {
     const rx = new RegExp(escapeRegex(parsed.q), "i");
-    conditions.push({ $or: [{ title: rx }, { contentText: rx }] });
+    conditions.push({ $or: [{ title: rx }, { contentHtml: rx }] });
   }
 
   // Filtre tags (ET logique).
@@ -299,10 +299,9 @@ notesRoutes.post("/", async (c) => {
   const links = await resolveLinks(input.links);
   const images = [...input.images].sort((a, b) => a.order - b.order);
   const attachments = input.attachments;
-  const contentHtml = sanitizeContent(input.contentHtml);
-  const bodyText = htmlToText(contentHtml);
+  const bodyHtml = sanitizeContent(input.contentHtml);
 
-  let contentText = bodyText;
+  let contentHtml = bodyHtml;
   let linkSummaryFailed = false;
   const firstLink = links[0];
   if (firstLink) {
@@ -312,7 +311,7 @@ notesRoutes.post("/", async (c) => {
       ogDescription: firstLink.description,
     });
     if (summary) {
-      contentText = composeContentText(bodyText, summary);
+      contentHtml = composeContentHtml(bodyHtml, summary);
     } else {
       linkSummaryFailed = true;
       console.warn("link summary failed:", error);
@@ -324,7 +323,6 @@ notesRoutes.post("/", async (c) => {
     _id: new ObjectId(),
     title: input.title,
     contentHtml,
-    contentText,
     authorId: meId,
     tags,
     images,
@@ -381,9 +379,8 @@ notesRoutes.put("/:id", async (c) => {
   const links = await resolveLinks(input.links);
   const images = [...input.images].sort((a, b) => a.order - b.order);
   const attachments = input.attachments;
-  const contentHtml = sanitizeContent(input.contentHtml);
-  const bodyText = htmlToText(contentHtml);
-  const contentText = preserveContentTextPrefix(note.contentText, note.contentHtml, bodyText);
+  const sanitizedBody = sanitizeContent(input.contentHtml);
+  const contentHtml = preserveContentHtmlPrefix(note.contentHtml, sanitizedBody);
   const now = new Date();
 
   await collections.notes(db).updateOne(
@@ -392,7 +389,6 @@ notesRoutes.put("/:id", async (c) => {
       $set: {
         title: input.title,
         contentHtml,
-        contentText,
         tags,
         images,
         attachments,
@@ -413,7 +409,6 @@ notesRoutes.put("/:id", async (c) => {
     ...note,
     title: input.title,
     contentHtml,
-    contentText,
     tags,
     images,
     attachments,

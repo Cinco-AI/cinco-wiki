@@ -120,10 +120,8 @@ export interface LinkPreview {
 export interface Note {
   id: string;
   title: string;
-  /** HTML rendu (rich text TipTap), assaini côté serveur. */
+  /** HTML rendu (rich text TipTap + éventuel résumé de lien), assaini côté serveur. */
   contentHtml: string;
-  /** Texte brut dérivé — sert à l'extrait et à la recherche. */
-  contentText: string;
   author: UserPublic;
   tags: string[];
   images: NoteImage[];

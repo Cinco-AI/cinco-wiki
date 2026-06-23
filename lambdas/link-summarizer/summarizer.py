@@ -19,8 +19,11 @@ USER_AGENT = "Mozilla/5.0 (compatible; CincoWikiBot/1.0; +https://cinco.ai)"
 
 SYSTEM_PROMPT = (
     "Tu résumes des pages web en français. "
-    "Réponds uniquement avec le résumé, sans guillemets ni préambule. "
-    f"Maximum {MAX_SUMMARY_CHARS} caractères (espaces inclus)."
+    "Réponds uniquement avec un fragment HTML (pas de markdown, pas de bloc ```). "
+    "Balises autorisées : p, strong, em, ul, ol, li, blockquote, br. "
+    "Pas de titres (h1–h3), pas de liens <a>, pas de <div>. "
+    "Structure le résumé clairement (paragraphe(s) et/ou liste à puces si pertinent). "
+    f"Maximum {MAX_SUMMARY_CHARS} caractères de texte visible (espaces inclus)."
 )
 
 
@@ -52,12 +55,19 @@ def fetch_page_text(url: str) -> str:
     return text[:MAX_PAGE_TEXT_CHARS]
 
 
-def _truncate_summary(text: str) -> str:
-    clean = _strip_ws(text)
-    if len(clean) <= MAX_SUMMARY_CHARS:
+def _visible_text_length(html: str) -> int:
+    return len(_strip_ws(BeautifulSoup(html, "html.parser").get_text(separator=" ")))
+
+
+def _truncate_summary_html(html: str) -> str:
+    clean = html.strip()
+    if not clean:
+        return ""
+    if _visible_text_length(clean) <= MAX_SUMMARY_CHARS:
         return clean
-    trimmed = clean[:MAX_SUMMARY_CHARS].rsplit(" ", 1)[0]
-    return trimmed.rstrip(".,;:!?") + "…"
+    text = _strip_ws(BeautifulSoup(clean, "html.parser").get_text(separator=" "))
+    trimmed = text[:MAX_SUMMARY_CHARS].rsplit(" ", 1)[0]
+    return f"<p>{trimmed.rstrip('.,;:!?')}…</p>"
 
 
 def _chat_summary(client: OpenAI, model: str, user_content: str) -> str:
@@ -73,7 +83,7 @@ def _chat_summary(client: OpenAI, model: str, user_content: str) -> str:
     content = response.choices[0].message.content
     if not content:
         raise RuntimeError("réponse OpenAI vide")
-    return _truncate_summary(content)
+    return _truncate_summary_html(content)
 
 
 def summarize_link(

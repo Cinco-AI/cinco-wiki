@@ -293,6 +293,11 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
         </div>
 
         <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Liens</label>
+          <LinkManager links={links} onChange={setLinks} />
+        </div>
+
+        <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Contenu</label>
           <RichTextEditor value={contentHtml} onChange={setContentHtml} />
         </div>
@@ -305,11 +310,6 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Documents</label>
           <DocumentUploader attachments={attachments} onChange={setAttachments} />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Liens</label>
-          <LinkManager links={links} onChange={setLinks} />
         </div>
 
         <div>

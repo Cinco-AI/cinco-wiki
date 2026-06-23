@@ -15,6 +15,7 @@ import type {
   NotificationDoc,
   UserDoc,
 } from "../lib/db.js";
+import { htmlToText } from "../lib/sanitize.js";
 
 /** Placeholder pour les notes/commentaires d'un compte supprimé (§12). */
 export const DELETED_USER: UserPublic = {
@@ -57,7 +58,6 @@ export function toNote(doc: NoteDoc, author: UserPublic, myVote: number | null):
     id: doc._id.toHexString(),
     title: doc.title,
     contentHtml: doc.contentHtml,
-    contentText: doc.contentText,
     author,
     tags: doc.tags,
     images: doc.images,
@@ -77,7 +77,7 @@ export function toNoteCard(doc: NoteDoc, author: UserPublic): NoteCard {
   return {
     id: doc._id.toHexString(),
     title: doc.title,
-    excerpt: buildExcerpt(doc.contentText),
+    excerpt: buildExcerpt(htmlToText(doc.contentHtml)),
     author,
     tags: doc.tags,
     firstImage: doc.images[0]?.url ?? null,

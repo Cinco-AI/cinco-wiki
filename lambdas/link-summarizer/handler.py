@@ -5,6 +5,11 @@ from __future__ import annotations
 import json
 from typing import Any
 
+try:
+    import unzip_requirements  # noqa: F401 — extrait .requirements.zip (serverless-python-requirements)
+except ImportError:
+    pass
+
 from summarizer import summarize_link
 
 

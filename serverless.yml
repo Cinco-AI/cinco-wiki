@@ -58,11 +58,17 @@ custom:
   # Surchargeable : sls deploy --param="bucketName=mon-bucket".
   bucketName: ${param:bucketName, '${self:service}-uploads-${sls:stage}'}
   pythonRequirements:
-    # arm64 Lambda : build des wheels via Docker sur Mac/Linux.
-    dockerizePip: true
+    # macOS : pas de binaire `python`, seulement `python3`.
+    pythonBin: python3
+    # Wheels manylinux arm64 via pip local (pas de Docker requis pour ces deps).
+    dockerizePip: false
     slim: true
-    # Copie handler.py + summarizer.py à la racine du zip (via `module` sur la fonction).
     zip: true
+    pipCmdExtraArgs:
+      - '--platform=manylinux2014_aarch64'
+      - '--python-version=3.11'
+      - '--implementation=cp'
+      - '--only-binary=:all:'
   esbuild:
     bundle: true
     minify: false
@@ -88,6 +94,12 @@ functions:
     architecture: arm64
     memorySize: 1024
     timeout: 25
+    # Limite le zip à la Lambda Python ; serverless-python-requirements
+    # remonte ensuite lambdas/link-summarizer/* à la racine (moveModuleUp).
+    package:
+      patterns:
+        - '!**'
+        - 'lambdas/link-summarizer/**'
     environment:
       OPENAI_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/OPENAI_API_KEY, ''}
 

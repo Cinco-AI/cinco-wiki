@@ -27,6 +27,11 @@ sst-env.d.ts
 # graphify
 graphify-out/
 
+# python lambda (serverless-python-requirements)
+lambdas/**/__pycache__/
+lambdas/**/.requirements.zip
+lambdas/**/unzip_requirements.py
+
 # misc
 .DS_Store
 *.log

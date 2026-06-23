@@ -7,11 +7,13 @@ import sanitizeHtml from "sanitize-html";
 const OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [
     "p", "br", "h1", "h2", "h3", "strong", "em", "u", "s", "code", "pre",
-    "blockquote", "ul", "ol", "li", "a", "span", "mark",
+    "blockquote", "ul", "ol", "li", "a", "span", "mark", "div",
     "table", "thead", "tbody", "tr", "th", "td",
   ],
   allowedAttributes: {
     a: ["href", "target", "rel"],
+    div: ["data-link-summary"],
+    p: ["data-link-summary"],
     span: ["style"],
     mark: ["style"],
     th: ["colspan", "rowspan"],
@@ -35,7 +37,7 @@ export function sanitizeContent(html: string): string {
   return sanitizeHtml(html, OPTIONS);
 }
 
-/** Texte brut dérivé du HTML (extrait de card + recherche). */
+/** Texte brut dérivé du HTML (extrait de card côté API). */
 export function htmlToText(html: string): string {
   return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} })
     .replace(/\s+/g, " ")

@@ -34,7 +34,6 @@ export interface NoteDoc {
   _id: ObjectId;
   title: string;
   contentHtml: string;
-  contentText: string;
   authorId: ObjectId | null; // null => « Utilisateur supprimé »
   tags: string[];
   images: NoteImage[];
