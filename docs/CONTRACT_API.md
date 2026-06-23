@@ -26,8 +26,9 @@ Toujours : valider l'entrée avec Zod via `body(c, schema)`, lever les erreurs v
 ## notes.ts
 - `GET /notes` (query `NoteQuery`) → `Paginated<NoteCard>`. Visibilité : `status:published` pour tous ; un brouillon n'est visible que dans `mine=true` du propriétaire. Filtres : `q` (recherche titre+contentText, regex insensible casse ou `$text`), `tags` (ET — `$all`), `authorId`, `dateFrom/dateTo` (sur createdAt), `sort` (recent=createdAt desc, oldest asc, top_rated=avgRating desc, most_commented=commentCount desc). `mine=true` → `authorId = courant` (inclut ses brouillons). Pagination par curseur (id+valeur de tri ; simple : cursor = dernier `_id`, limite défaut 24).
 - `GET /notes/:id` → `Note` complet. 404 si introuvable. Brouillon : visible seulement par auteur ou admin (403/404 sinon). Inclure `myVote` (vote du courant).
-- `POST /notes` (`NoteInput`) → `Note`. authorId = courant. Sanitiser `contentHtml` via `sanitizeContent`, dériver `contentText` via `htmlToText`. Normaliser tags (`normalizeTag`, dédup, max `LIMITS.tagsPerNote`) et mettre à jour les compteurs `tags` (+1, upsert). Résoudre les `links` (URLs) en `LinkPreview[]` via l'OG (réutiliser logique de og.ts ; max `LIMITS.linksPerNote`). Valider images (max `LIMITS.imagesPerNote`). Compteurs init à 0.
-- `PUT /notes/:id` (`NoteInput`) → `Note`. **Auteur ou admin uniquement** (403 sinon, cf §6.7). Recalcule contentText, ajuste les compteurs de tags (retirer anciens, ajouter nouveaux).
+- `POST /notes` (`NoteInput`) → `Note`. authorId = courant. Sanitiser `contentHtml` via `sanitizeContent`, dériver le corps via `htmlToText`. Normaliser tags (`normalizeTag`, dédup, max `LIMITS.tagsPerNote`) et mettre à jour les compteurs `tags` (+1, upsert). Résoudre les `links` (URLs) en `LinkPreview[]` via l'OG (réutiliser logique de og.ts ; max `LIMITS.linksPerNote`). Valider images (max `LIMITS.imagesPerNote`). Compteurs init à 0.
+  - **Résumé de lien (création uniquement)** : si un lien externe est présent, invoquer sync la Lambda Python `linkSummarizer` (`lib/link-summarizer-client.ts`) avec l'URL + métadonnées OG. En cas de succès, préfixer `contentText` : `{résumé}\n\n{corps TipTap}` (~300 car., français, modèle `gpt-5-nano`). Best effort : si échec ou timeout (22 s côté caller), sauvegarder sans préfixe et créer une notification `link_summary_failed` à l'auteur (`createNotification`). Pas de re-résumé à la modification.
+- `PUT /notes/:id` (`NoteInput`) → `Note`. **Auteur ou admin uniquement** (403 sinon, cf §6.7). Recalcule `contentText` à partir du corps TipTap via `preserveContentTextPrefix` (`lib/content-text.ts`) : conserve le préfixe résumé déjà stocké dans `contentText` (même si le lien est supprimé). Ajuste les compteurs de tags (retirer anciens, ajouter nouveaux). **Pas** d'appel au summarizer.
 - `DELETE /notes/:id` → 204. Auteur ou admin. Supprimer votes & commentaires liés, décrémenter compteurs de tags.
 
 ## votes.ts  (vote possible uniquement depuis le détail ; toute note publiée, y compris la sienne)
@@ -51,6 +52,11 @@ Toujours : valider l'entrée avec Zod via `body(c, schema)`, lever les erreurs v
 - `POST /notifications/:id/read` → 204.
 - `POST /notifications/read-all` → 204.
 - Helper exporté `createNotification(db, userId, type, message, noteId?)` réutilisé par les autres routes — **le créer ici et l'exporter** ; users/notes/votes/comments l'importent.
+- Types : `comment_on_note`, `vote_on_note`, `account_created`, `account_updated`, `link_summary_failed` (échec du résumé automatique d'un lien à la création de note).
+
+## linkSummarizer (Lambda Python, pas de route HTTP)
+- Handler : `lambdas/link-summarizer/handler.summarize`. Invoquée en sync par `POST /notes` via `@aws-sdk/client-lambda` (`lib/link-summarizer-client.ts`). Config : `python3.11`, arm64, 1024 MB, timeout 25 s. Secret `OPENAI_API_KEY` (SSM).
+- Entrée : `{ url, ogTitle?, ogDescription? }`. Fetch HTML (httpx + BeautifulSoup, timeout 8 s) + métadonnées OG → OpenAI Chat (`gpt-5-nano`, fallback `gpt-4.1-nano`). Sortie : `{ summary }` ou `{ error }`. Résumé tronqué à ~300 car., français.
 
 ## uploads.ts
 - `POST /uploads/presign` (`PresignUploadInput`) → `PresignUploadResult`. Vérifier MIME ∈ `IMAGE_MIME`, taille ≤ `LIMITS.imageMaxBytes`. Générer une clé `notes/{userId}/{uuid}-{filename}`, URL pré-signée PUT S3 (`@aws-sdk/s3-request-presigner`), `publicUrl` = URL publique du bucket (`env.bucket`, `env.region`).
