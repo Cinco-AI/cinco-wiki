@@ -133,8 +133,8 @@ async function ensureIndexes(db: Db): Promise<void> {
     collections.notes(db).createIndex({ status: 1, createdAt: -1 }),
     collections.notes(db).createIndex({ authorId: 1 }),
     collections.notes(db).createIndex({ tags: 1 }),
-    // Index texte de secours si Atlas Search n'est pas configuré.
-    collections.notes(db).createIndex({ title: "text", contentText: "text" }),
+    // Index texte sur le titre uniquement (contentText non indexé).
+    collections.notes(db).createIndex({ title: "text" }),
     collections.votes(db).createIndex({ noteId: 1, userId: 1 }, { unique: true }),
     collections.comments(db).createIndex({ noteId: 1, createdAt: 1 }),
     collections.tags(db).createIndex({ name: 1 }, { unique: true }),
