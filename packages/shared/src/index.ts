@@ -17,7 +17,7 @@ export const LIMITS = {
   imageMaxBytes: 5 * 1024 * 1024,
   attachmentsPerNote: 10,
   attachmentMaxBytes: 20 * 1024 * 1024,
-  linksPerNote: 5,
+  linksPerNote: 1,
   cardExcerptChars: 150,
   voteMin: 1,
   voteMax: 5,

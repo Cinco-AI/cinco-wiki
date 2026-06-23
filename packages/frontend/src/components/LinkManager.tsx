@@ -78,7 +78,11 @@ export function LinkManager({ links, onChange }: LinkManagerProps) {
       return;
     }
     if (atMax) {
-      setError(`Maximum ${LIMITS.linksPerNote} liens par note.`);
+      setError(
+        LIMITS.linksPerNote === 1
+          ? "Un seul lien externe par note."
+          : `Maximum ${LIMITS.linksPerNote} liens par note.`,
+      );
       return;
     }
     setError(null);
@@ -114,11 +118,13 @@ export function LinkManager({ links, onChange }: LinkManagerProps) {
           className="flex items-center gap-2 text-sm font-medium text-gray-700"
         >
           <Link2 className="h-4 w-4 text-brand-600" aria-hidden="true" />
-          Liens externes
+          {LIMITS.linksPerNote === 1 ? "Lien externe" : "Liens externes"}
         </h3>
-        <span className="text-xs text-gray-400" aria-live="polite">
-          {links.length}/{LIMITS.linksPerNote}
-        </span>
+        {LIMITS.linksPerNote > 1 && (
+          <span className="text-xs text-gray-400" aria-live="polite">
+            {links.length}/{LIMITS.linksPerNote}
+          </span>
+        )}
       </div>
 
       <div className="flex gap-2">
@@ -129,7 +135,13 @@ export function LinkManager({ links, onChange }: LinkManagerProps) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           disabled={atMax}
-          placeholder={atMax ? "Limite de liens atteinte" : "https://exemple.com/article"}
+          placeholder={
+            atMax
+              ? LIMITS.linksPerNote === 1
+                ? "Un seul lien autorisé"
+                : "Limite de liens atteinte"
+              : "https://exemple.com/article"
+          }
           aria-label="Ajouter une URL"
           aria-invalid={Boolean(error)}
           aria-describedby={error ? "link-manager-error" : undefined}
