@@ -14,6 +14,9 @@ import { body, errors, oid, type AppEnv } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";
 import { sanitizeContent, htmlToText } from "../lib/sanitize.js";
 import { toNote, toNoteCard } from "../models/index.js";
+import { composeContentText, preserveContentTextPrefix } from "../lib/content-text.js";
+import { summarizeExternalLink } from "../lib/link-summarizer-client.js";
+import { createNotification } from "../routes/notifications.js";
 import { fetchOgPreview } from "../routes/og.js";
 
 export const notesRoutes = new Hono<AppEnv>();
@@ -297,7 +300,24 @@ notesRoutes.post("/", async (c) => {
   const images = [...input.images].sort((a, b) => a.order - b.order);
   const attachments = input.attachments;
   const contentHtml = sanitizeContent(input.contentHtml);
-  const contentText = htmlToText(contentHtml);
+  const bodyText = htmlToText(contentHtml);
+
+  let contentText = bodyText;
+  let linkSummaryFailed = false;
+  const firstLink = links[0];
+  if (firstLink) {
+    const { summary, error } = await summarizeExternalLink({
+      url: firstLink.url,
+      ogTitle: firstLink.title,
+      ogDescription: firstLink.description,
+    });
+    if (summary) {
+      contentText = composeContentText(bodyText, summary);
+    } else {
+      linkSummaryFailed = true;
+      console.warn("link summary failed:", error);
+    }
+  }
 
   const now = new Date();
   const doc: NoteDoc = {
@@ -320,6 +340,16 @@ notesRoutes.post("/", async (c) => {
 
   await collections.notes(db).insertOne(doc);
   await adjustTagCounts(db, tags, 1);
+
+  if (linkSummaryFailed) {
+    await createNotification(
+      db,
+      meId,
+      "link_summary_failed",
+      `Le résumé automatique du lien externe n'a pas pu être généré pour votre note « ${input.title} ».`,
+      doc._id,
+    );
+  }
 
   const resolve = await authorResolver(db, [doc.authorId]);
   return c.json(toNote(doc, resolve(doc.authorId), null) satisfies Note, 201);
@@ -352,7 +382,8 @@ notesRoutes.put("/:id", async (c) => {
   const images = [...input.images].sort((a, b) => a.order - b.order);
   const attachments = input.attachments;
   const contentHtml = sanitizeContent(input.contentHtml);
-  const contentText = htmlToText(contentHtml);
+  const bodyText = htmlToText(contentHtml);
+  const contentText = preserveContentTextPrefix(note.contentText, note.contentHtml, bodyText);
   const now = new Date();
 
   await collections.notes(db).updateOne(

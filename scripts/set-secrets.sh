@@ -22,7 +22,8 @@
 #   MONGODB_URI   (requis)  -> SecureString
 #   JWT_SECRET    (requis)  -> SecureString
 #   MONGODB_DB    (optionnel, défaut "cinco-wiki")
-#   CORS_ORIGINS  (optionnel, défaut "*")
+#   CORS_ORIGINS      (optionnel, défaut "*")
+#   OPENAI_API_KEY    (optionnel) -> SecureString — résumé de liens externes
 set -euo pipefail
 
 STAGE="${1:-dev}"
@@ -57,4 +58,5 @@ put MONGODB_URI  "${MONGODB_URI:-}"            SecureString
 put JWT_SECRET   "${JWT_SECRET:-}"             SecureString
 put MONGODB_DB   "${MONGODB_DB:-cinco-wiki}"   String
 put CORS_ORIGINS "${CORS_ORIGINS:-*}"          String
+put OPENAI_API_KEY "${OPENAI_API_KEY:-}"       SecureString
 echo "OK"

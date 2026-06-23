@@ -59,7 +59,8 @@ export type NotificationType =
   | "comment_on_note"
   | "vote_on_note"
   | "account_created"
-  | "account_updated";
+  | "account_updated"
+  | "link_summary_failed";
 
 // ---------------------------------------------------------------------------
 // DTO publics (ce que l'API renvoie — jamais de passwordHash)

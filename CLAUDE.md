@@ -74,6 +74,8 @@ packages/frontend  → Next.js App Router, TipTap, SWR
 - `lib/db.ts` — MongoDB documents (`UserDoc`, `NoteDoc`, etc.), `collections` accessor, connection pool cached across Lambda invocations
 - `lib/auth.ts` — JWT access/refresh tokens via `jose`, bcrypt password hashing
 - `lib/sanitize.ts` — `sanitizeContent()` (sanitize-html for TipTap HTML) + `htmlToText()` — called on every note write
+- `lib/content-text.ts` — `composeContentText()`, `preserveContentTextPrefix()` — résumé de lien préfixé dans `contentText`
+- `lib/link-summarizer-client.ts` — invoke sync Lambda Python `linkSummarizer`
 - `lib/relations.ts` — `authorResolver()` for resolving `authorId → UserPublic` with soft-delete handling (`null authorId` → "Utilisateur supprimé" placeholder)
 - `models/index.ts` — mapper functions (`toNote`, `toNoteCard`, `toUserPublic`, etc.) — always use these before returning to client, never expose raw docs
 
@@ -81,7 +83,9 @@ packages/frontend  → Next.js App Router, TipTap, SWR
 
 **Denormalized counters**: `NoteDoc` stores `avgRating`, `voteCount`, `commentCount` updated in place on every vote/comment mutation. `tags` collection stores per-tag `count` updated on note create/update/delete.
 
-**Note write pipeline** (create + update): `sanitizeContent` → `htmlToText` → `normalizeTag` each tag → resolve `links[]` URLs to `LinkPreview[]` via `fetchOgPreview` → adjust tag counters.
+**Note write pipeline** (create): `sanitizeContent` → `resolveLinks` (OG) → si lien présent : invoke sync `linkSummarizer` (Python, gpt-5-nano) → `contentText = résumé + "\n\n" + htmlToText(html)` (best effort ; notif `link_summary_failed` si échec) → normaliser tags → adjust tag counters.
+
+**Note write pipeline** (update): `sanitizeContent` → `preserveContentTextPrefix` (conserve le résumé dans `contentText` même sans lien) → `resolveLinks` → normaliser tags → adjust tag counters. Pas de re-résumé.
 
 ### Frontend
 
@@ -107,6 +111,8 @@ packages/frontend  → Next.js App Router, TipTap, SWR
 
 Secrets live in AWS SSM Parameter Store at `/cinco-wiki/<stage>/<KEY>`. Push with `npm run secrets:set` (reads `.env`). Backend reads them at Lambda cold start via `lib/env.ts`. Never hardcode secrets; never commit `.env`.
 
+Lambdas : `api` (Hono, Node.js) + `linkSummarizer` (Python 3.11, `lambdas/link-summarizer/`, OpenAI via `OPENAI_API_KEY` SSM). L'API invoque `linkSummarizer` en sync à la création de note avec lien.
+
 S3 bucket (`cinco-wiki-uploads-<stage>`) serves images and attachments publicly. Upload flow: frontend calls `POST /uploads/presign` → gets presigned PUT URL → uploads directly to S3 → stores the `publicUrl` in the note.
 
 MongoDB fallback text search (`$text`) is available if Atlas Search is not configured; Atlas Search index on `title` + `contentText` is preferred.
@@ -116,5 +122,5 @@ MongoDB fallback text search (`$text`) is available if Atlas Search is not confi
 - `authorId: null` on notes/comments means deleted user — always handle this in mappers and UI
 - Cursor pagination uses MongoDB `_id` as cursor (base64url encoded), default limit 24
 - Tag names are normalized via `normalizeTag()` (trim, lowercase, collapse spaces) before storage and lookup — always normalize before querying
-- Content HTML from TipTap must be sanitized server-side via `sanitizeContent()` before storage; `contentText` is always derived server-side
+- Content HTML from TipTap must be sanitized server-side via `sanitizeContent()` before storage; `contentText` is always derived server-side (corps TipTap + éventuel préfixe résumé de lien à la création)
 - Access tokens are short-lived; refresh tokens respect `tokenVersion` on `UserDoc` — incrementing `tokenVersion` (on disable/reset-password) invalidates all existing sessions

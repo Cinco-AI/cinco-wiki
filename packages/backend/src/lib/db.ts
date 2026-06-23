@@ -125,6 +125,31 @@ export const collections = {
 };
 
 let indexesReady = false;
+
+const NOTES_TEXT_INDEX_NAME = "title_text";
+
+/** Un seul index $text sur `title` — supprime un ancien index incluant contentText. */
+async function ensureNotesTextIndex(db: Db): Promise<void> {
+  const notes = collections.notes(db);
+  const indexes = await notes.indexes();
+
+  for (const idx of indexes) {
+    const key = idx.key as Record<string, unknown> | undefined;
+    if (!key || !("_fts" in key)) continue;
+
+    const weights = (idx.weights ?? {}) as Record<string, number>;
+    const isTitleOnly = weights.title === 1 && !weights.contentText;
+    if (isTitleOnly && idx.name === NOTES_TEXT_INDEX_NAME) return;
+
+    if (idx.name) await notes.dropIndex(idx.name);
+  }
+
+  await notes.createIndex(
+    { title: "text" },
+    { name: NOTES_TEXT_INDEX_NAME, default_language: "english" },
+  );
+}
+
 async function ensureIndexes(db: Db): Promise<void> {
   if (indexesReady) return;
   indexesReady = true;
@@ -133,8 +158,7 @@ async function ensureIndexes(db: Db): Promise<void> {
     collections.notes(db).createIndex({ status: 1, createdAt: -1 }),
     collections.notes(db).createIndex({ authorId: 1 }),
     collections.notes(db).createIndex({ tags: 1 }),
-    // Index texte sur le titre uniquement (contentText non indexé).
-    collections.notes(db).createIndex({ title: "text" }),
+    ensureNotesTextIndex(db),
     collections.votes(db).createIndex({ noteId: 1, userId: 1 }, { unique: true }),
     collections.comments(db).createIndex({ noteId: 1, createdAt: 1 }),
     collections.tags(db).createIndex({ name: 1 }, { unique: true }),

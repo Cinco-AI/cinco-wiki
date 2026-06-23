@@ -8,12 +8,17 @@
 #   /cinco-wiki/<stage>/JWT_SECRET    (SecureString, requis)
 #   /cinco-wiki/<stage>/MONGODB_DB    (String, défaut "cinco-wiki")
 #   /cinco-wiki/<stage>/CORS_ORIGINS  (String, défaut "*")
+#   /cinco-wiki/<stage>/OPENAI_API_KEY (SecureString, optionnel — résumé de liens)
 
 service: cinco-wiki
 
 plugins:
   - serverless-esbuild
+  - serverless-python-requirements
   - serverless-offline
+
+package:
+  individually: true
 
 provider:
   name: aws
@@ -44,10 +49,20 @@ provider:
             - s3:GetObject
             - s3:DeleteObject
           Resource: arn:aws:s3:::${self:custom.bucketName}/*
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+          Resource: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${self:service}-${sls:stage}-linkSummarizer
 
 custom:
   # Surchargeable : sls deploy --param="bucketName=mon-bucket".
   bucketName: ${param:bucketName, '${self:service}-uploads-${sls:stage}'}
+  pythonRequirements:
+    # arm64 Lambda : build des wheels via Docker sur Mac/Linux.
+    dockerizePip: true
+    slim: true
+    # Copie handler.py + summarizer.py à la racine du zip (via `module` sur la fonction).
+    zip: true
   esbuild:
     bundle: true
     minify: false
@@ -59,9 +74,22 @@ custom:
 functions:
   api:
     handler: packages/backend/src/index.handler
+    timeout: 29
+    environment:
+      LINK_SUMMARIZER_FUNCTION: ${self:service}-${sls:stage}-linkSummarizer
     # Catch-all : toutes les méthodes / tous les chemins → router interne Hono.
     events:
       - httpApi: '*'
+
+  linkSummarizer:
+    handler: handler.summarize
+    module: lambdas/link-summarizer
+    runtime: python3.11
+    architecture: arm64
+    memorySize: 1024
+    timeout: 25
+    environment:
+      OPENAI_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/OPENAI_API_KEY, ''}
 
 resources:
   Resources:

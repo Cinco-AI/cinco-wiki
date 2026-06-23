@@ -106,7 +106,7 @@ La page d'accueil après connexion affiche l'ensemble des notes de la plateforme
 | Élément | Description | Affichage |
 |---|---|---|
 | Titre | Titre complet de la note | Texte en gras, tronqué après 2 lignes si trop long |
-| Extrait du contenu | Les 150 premiers caractères du texte (sans balises HTML) | Texte gris, tronqué avec ellipse « … » |
+| Extrait du contenu | Les 150 premiers caractères du texte (sans balises HTML) ; inclut le résumé automatique du lien externe s'il a été généré à la création | Texte gris, tronqué avec ellipse « … » |
 | Tags | Liste des étiquettes associées | Badges colorés, max 3 visibles + « +N » si davantage |
 | Auteur | Avatar + nom de l'auteur | Photo de profil miniature + prénom nom |
 | Date | Date de création ou dernière modification | Format relatif : « il y a 2 heures », « il y a 3 jours » |
@@ -125,7 +125,7 @@ La page d'accueil après connexion affiche l'ensemble des notes de la plateforme
 
 | Fonctionnalité | Détail |
 |---|---|
-| Recherche full-text | Saisie libre — recherche dans le titre ET le contenu (temps réel, délai de frappe 300 ms) |
+| Recherche full-text | Saisie libre — recherche dans le titre ET le contenu (`contentText`, incluant le résumé auto du lien) (temps réel, délai de frappe 300 ms) |
 | Filtre par tag | Sélection d'un ou plusieurs tags dans une liste déroulante (combinaison en ET) |
 | Filtre par auteur | Sélection d'un utilisateur dans une liste |
 | Filtre par date | Plage de dates (date de création ou de modification) |
@@ -203,11 +203,24 @@ Le contenu est édité via un éditeur WYSIWYG (ex. TipTap, Quill ou ProseMirror
 
 ### 6.5 Gestion des Liens Externes
 
-- Champ dédié pour ajouter une ou plusieurs URLs
+- Champ dédié pour ajouter **une** URL (`LIMITS.linksPerNote = 1`)
 - Après validation, le système récupère automatiquement les métadonnées Open Graph (titre, description, image, domaine)
 - La preview est affichée sous le champ et sera visible dans la card et le modal
-- Maximum 5 liens par note
 - Modification et suppression d'un lien individuel
+
+#### Résumé automatique du lien (création uniquement)
+
+Lors de la **publication d'une nouvelle note** contenant un lien externe, le backend génère un résumé en français (~300 caractères) à partir des métadonnées OG et du contenu HTML de la page, via une Lambda Python dédiée (OpenAI `gpt-5-nano`).
+
+| Règle | Détail |
+|---|---|
+| Déclenchement | Uniquement à la **création** (`POST /notes`), pas à l'édition |
+| Mode | Synchrone — l'utilisateur attend la fin du résumé avant la réponse HTTP |
+| Stockage | Préfixé au début de `contentText` : `{résumé}\n\n{corps de la note}` |
+| Recherche & extrait | Le résumé est indexé dans la recherche full-text et visible dans l'extrait des cards |
+| Échec | La note est créée sans résumé (best effort) ; notification in-app `link_summary_failed` à l'auteur |
+| Suppression du lien | Le résumé **reste** dans `contentText` (conservé à l'édition même si le lien est retiré) |
+| Re-résumé | Jamais — modifier une note ou re-ajouter un lien ne relance pas le résumé |
 
 ### 6.6 Sauvegarde
 
@@ -339,6 +352,7 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 |---|---|---|
 | Nouveau commentaire sur ma note | Auteur de la note | « [Prénom] a commenté votre note « [Titre] » » |
 | Nouveau vote sur ma note | Auteur de la note | « Quelqu'un a noté votre note « [Titre] » : X étoiles » |
+| Échec du résumé automatique d'un lien (création) | Auteur de la note | « Le résumé automatique du lien externe n'a pas pu être généré pour votre note « [Titre] ». » |
 | Mon compte a été créé | Nouvel utilisateur | « Bienvenue ! Votre compte a été créé par l'administrateur. » |
 | Mon compte a été modifié | Utilisateur concerné | « Votre compte a été modifié par l'administrateur. » |
 
@@ -356,7 +370,7 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 | Commentaire | Texte libre ≤ 1 000 caractères, modifiable/supprimable par son auteur ou l'admin |
 | Tags | Libres, max 10 par note, créables à la volée, normalisés en minuscules |
 | Images | Max 10 par note, max 5 Mo chacune, formats JPG/PNG/GIF/WEBP |
-| Liens | Max 5 par note, prévisualisation Open Graph automatique |
+| Liens | Max 1 par note, prévisualisation Open Graph automatique, résumé IA à la création (préfixe dans `contentText`) |
 | Brouillons | Visibles uniquement par leur auteur et l'administrateur |
 | Compte désactivé | L'utilisateur ne peut plus se connecter, ses notes restent visibles |
 | Suppression de compte | Les notes sont conservées et attribuées à « Utilisateur supprimé » |
@@ -367,7 +381,7 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 
 | Domaine | Exigence |
 |---|---|
-| Performance | Chargement initial < 3 secondes. Recherche full-text < 500 ms |
+| Performance | Chargement initial < 3 secondes. Recherche full-text < 500 ms. Création de note avec lien externe : jusqu'à ~25 s (résumé IA sync) |
 | Sécurité | Authentification par token JWT ou session sécurisée. HTTPS obligatoire. Protection CSRF. Validation côté serveur de toutes les entrées |
 | Accessibilité | Respect des critères WCAG 2.1 niveau AA. Navigation au clavier. Attributs ARIA sur les composants interactifs |
 | Compatibilité navigateurs | Chrome, Firefox, Safari, Edge — versions N-1 minimum |
@@ -390,18 +404,21 @@ Un centre de notifications accessible depuis la barre de navigation informe l'ut
 | Stockage fichiers | AWS S3 | Bucket en **eu-west-3**, intégration native Lambda |
 | Authentification | JWT + refresh tokens | Stateless, sécurisé, compatible Netlify + Lambda séparés |
 | Recherche full-text | MongoDB Atlas Search | Intégré à Atlas, pas d'infrastructure supplémentaire |
-| Preview liens | Lambda dédié (scraping OG) | Extraction Open Graph depuis les URLs |
+| Preview liens | Route `GET /og` (scraping OG via cheerio) | Extraction Open Graph depuis les URLs |
+| Résumé de liens | Lambda Python `linkSummarizer` (OpenAI `gpt-5-nano`) | Invoquée en sync à la création de note ; fetch HTML + OG → résumé ~300 car. en français, préfixé dans `contentText` |
 
 ### Architecture de déploiement
 
 ```
 Netlify                     AWS (eu-west-3)
-┌─────────────┐             ┌──────────────────────────────┐
-│  Next.js    │  REST API   │  API Gateway                 │
-│  (frontend) │ ──────────► │    └── AWS Lambda (Hono)     │
-│             │             │          └── MongoDB Atlas    │
-└─────────────┘             │          └── S3 (images)     │
-                            └──────────────────────────────┘
+┌─────────────┐             ┌──────────────────────────────────────────┐
+│  Next.js    │  REST API   │  API Gateway                             │
+│  (frontend) │ ──────────► │    └── Lambda api (Hono, Node.js)        │
+│             │             │          ├── invoke sync ──► linkSummarizer│
+└─────────────┘             │          │                    (Python)    │
+                            │          ├── MongoDB Atlas                │
+                            │          └── S3 (images)                   │
+                            └──────────────────────────────────────────┘
 ```
 
 ---
