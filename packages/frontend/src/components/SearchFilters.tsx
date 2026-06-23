@@ -41,6 +41,9 @@ export function SearchFilters({ query, onChange, tags, users }: SearchFiltersPro
   const [searchText, setSearchText] = useState(query.q ?? "");
   const [showFilters, setShowFilters] = useState(false);
 
+  // Dernière valeur poussée vers l'URL — évite d'écraser la saisie locale au retour du query param.
+  const lastEmittedQRef = useRef<string | undefined>(query.q);
+
   // Réfs « fraîches » pour ne pas figer la closure du debounce.
   const queryRef = useRef(query);
   const onChangeRef = useRef(onChange);
@@ -59,20 +62,34 @@ export function SearchFilters({ query, onChange, tags, users }: SearchFiltersPro
 
   // Recherche full-text debouncée (LIMITS.searchDebounceMs = 300).
   useEffect(() => {
-    if (searchText === (queryRef.current.q ?? "")) return;
-    const t = setTimeout(() => emit({ q: searchText || undefined }), LIMITS.searchDebounceMs);
+    const urlQ = queryRef.current.q ?? "";
+    if (searchText === urlQ) return;
+    const t = setTimeout(() => {
+      const nextQ = searchText || undefined;
+      lastEmittedQRef.current = nextQ;
+      emit({ q: nextQ });
+    }, LIMITS.searchDebounceMs);
     return () => clearTimeout(t);
   }, [searchText, emit]);
 
-  // Synchronise le champ si la requête change depuis l'extérieur.
+  // Synchronise le champ seulement si l'URL a changé depuis l'extérieur (NavBar, lien partagé, retour arrière).
   useEffect(() => {
-    setSearchText(query.q ?? "");
+    const urlQ = query.q;
+    if (urlQ === lastEmittedQRef.current) return;
+    lastEmittedQRef.current = urlQ;
+    setSearchText(urlQ ?? "");
   }, [query.q]);
+
+  function pushSearchNow(value: string) {
+    const nextQ = value || undefined;
+    lastEmittedQRef.current = nextQ;
+    emit({ q: nextQ });
+  }
 
   function onSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
-      emit({ q: searchText || undefined });
+      pushSearchNow(searchText);
     } else if (e.key === "Escape" && searchText) {
       e.preventDefault();
       setSearchText("");
@@ -88,6 +105,7 @@ export function SearchFilters({ query, onChange, tags, users }: SearchFiltersPro
   }
 
   function reset() {
+    lastEmittedQRef.current = undefined;
     setSearchText("");
     onChange({ sort: query.sort });
   }

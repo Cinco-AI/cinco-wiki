@@ -105,7 +105,7 @@ export function NotesDashboard({ openNoteId, initialTag }: NotesDashboardProps) 
 
   return (
     <section aria-label="Tableau de bord des notes" className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <SearchFilters query={query} onChange={applyQuery} tags={tags ?? []} users={users} />
+      <SearchFilters query={filterQuery} onChange={applyQuery} tags={tags ?? []} users={users} />
 
       {firstLoading ? (
         <div className="flex justify-center py-20" aria-live="polite">

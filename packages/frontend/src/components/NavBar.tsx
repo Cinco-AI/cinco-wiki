@@ -14,6 +14,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { LIMITS } from "@cinco-wiki/shared";
 import { useAuth } from "@/lib/auth-context";
 import { fullName } from "@/lib/format";
 import { Avatar } from "@/components/Avatar";
@@ -24,15 +25,31 @@ export function NavBar() {
   const { user, isAdmin, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState("");
+  const initialQ = searchParams.get("q") ?? "";
+  const [query, setQuery] = useState(initialQ);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const lastEmittedQRef = useRef(initialQ);
 
-  // Affiche la recherche active depuis l'URL (/?q=…).
+  // Synchronise depuis l'URL seulement si le changement vient de l'extérieur.
   useEffect(() => {
-    setQuery(searchParams.get("q") ?? "");
+    const urlQ = searchParams.get("q") ?? "";
+    if (urlQ === lastEmittedQRef.current) return;
+    lastEmittedQRef.current = urlQ;
+    setQuery(urlQ);
   }, [searchParams]);
+
+  // Recherche debouncée vers l'URL (cohérent avec SearchFilters).
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (trimmed === lastEmittedQRef.current) return;
+    const t = setTimeout(() => {
+      lastEmittedQRef.current = trimmed;
+      router.replace(trimmed ? `/?q=${encodeURIComponent(trimmed)}` : "/");
+    }, LIMITS.searchDebounceMs);
+    return () => clearTimeout(t);
+  }, [query, router]);
 
   // Fermeture du menu compte au clic extérieur + Échap.
   useEffect(() => {
@@ -54,7 +71,8 @@ export function NavBar() {
   function onSearch(e: React.FormEvent) {
     e.preventDefault();
     const q = query.trim();
-    router.push(q ? `/?q=${encodeURIComponent(q)}` : "/");
+    lastEmittedQRef.current = q;
+    router.replace(q ? `/?q=${encodeURIComponent(q)}` : "/");
     setMobileOpen(false);
   }
 
