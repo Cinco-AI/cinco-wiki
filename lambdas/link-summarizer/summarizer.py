@@ -1,4 +1,4 @@
-"""Fetch page + résumé OpenAI (~300 car., français)."""
+"""Fetch page + résumé OpenAI (~1500 car., français)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from openai import APIError, OpenAI
 
 MODEL_PRIMARY = "gpt-5-nano"
 MODEL_FALLBACK = "gpt-4.1-nano"
-MAX_SUMMARY_CHARS = 300
+MAX_SUMMARY_CHARS = 1500
 MAX_PAGE_BYTES = 512 * 1024
 MAX_PAGE_TEXT_CHARS = 12_000
 FETCH_TIMEOUT_S = 8.0
@@ -77,7 +77,7 @@ def _chat_summary(client: OpenAI, model: str, user_content: str) -> str:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_content},
         ],
-        max_tokens=120,
+        max_tokens=800,
         temperature=0.3,
     )
     content = response.choices[0].message.content
