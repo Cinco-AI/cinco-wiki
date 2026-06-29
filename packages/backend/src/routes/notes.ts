@@ -10,7 +10,7 @@ import type {
 } from "@cinco-wiki/shared";
 import { LIMITS, normalizeTag } from "@cinco-wiki/shared";
 import { collections, type NoteDoc } from "../lib/db.js";
-import { body, errors, oid, type AppEnv } from "../lib/http.js";
+import { body, errors, HttpError, oid, type AppEnv } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";
 import { sanitizeContent } from "../lib/sanitize.js";
 import { toNote, toNoteCard } from "../models/index.js";
@@ -417,6 +417,61 @@ notesRoutes.put("/:id", async (c) => {
     updatedAt: now,
   };
 
+  const resolve = await authorResolver(db, [updated.authorId]);
+  const myVote = await myVoteValue(db, id, meId);
+  return c.json(toNote(updated, resolve(updated.authorId), myVote) satisfies Note);
+});
+
+// ---------------------------------------------------------------------------
+// POST /notes/:id/regenerate-link-summary — regénère le résumé du lien (édition)
+// ---------------------------------------------------------------------------
+
+notesRoutes.post("/:id/regenerate-link-summary", async (c) => {
+  const db = c.get("db");
+  const meId = new ObjectId(c.get("userId"));
+  const isAdmin = c.get("role") === "admin";
+  const id = oid(c.req.param("id"));
+
+  const note = await collections.notes(db).findOne({ _id: id });
+  if (!note) throw errors.notFound();
+  if (!canEditNote(note, meId, isAdmin)) throw errors.forbidden();
+
+  const firstLink = note.links[0];
+  if (!firstLink) {
+    throw errors.badRequest("Cette note n'a pas de lien externe.");
+  }
+
+  const { summary, error } = await summarizeExternalLink({
+    url: firstLink.url,
+    ogTitle: firstLink.title,
+    ogDescription: firstLink.description,
+  });
+
+  if (!summary) {
+    console.warn("link summary regeneration failed:", error);
+    await createNotification(
+      db,
+      meId,
+      "link_summary_failed",
+      `Le résumé automatique du lien externe n'a pas pu être regénéré pour votre note « ${note.title} ».`,
+      id,
+    );
+    throw new HttpError(
+      502,
+      "LINK_SUMMARY_FAILED",
+      "Le résumé automatique n'a pas pu être généré.",
+    );
+  }
+
+  const contentHtml = composeContentHtml("", summary);
+  const now = new Date();
+
+  await collections.notes(db).updateOne(
+    { _id: id },
+    { $set: { contentHtml, updatedAt: now } },
+  );
+
+  const updated: NoteDoc = { ...note, contentHtml, updatedAt: now };
   const resolve = await authorResolver(db, [updated.authorId]);
   const myVote = await myVoteValue(db, id, meId);
   return c.json(toNote(updated, resolve(updated.authorId), myVote) satisfies Note);

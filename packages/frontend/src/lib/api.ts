@@ -163,6 +163,8 @@ export const api = {
   createNote: (input: NoteInput) => request<Note>("/notes", { method: "POST", body: input }),
   updateNote: (id: string, input: NoteInput) =>
     request<Note>(`/notes/${id}`, { method: "PUT", body: input }),
+  regenerateLinkSummary: (id: string) =>
+    request<Note>(`/notes/${id}/regenerate-link-summary`, { method: "POST" }),
   deleteNote: (id: string) => request<void>(`/notes/${id}`, { method: "DELETE" }),
 
   // --- Votes ---

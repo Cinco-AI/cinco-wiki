@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { AlertCircle, Check, Loader2, Save, Send } from "lucide-react";
+import { AlertCircle, Check, Loader2, RefreshCw, Save, Send } from "lucide-react";
 import {
   LIMITS,
   type Note,
@@ -71,6 +71,8 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [submitting, setSubmitting] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmRegenerate, setConfirmRegenerate] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   const idRef = useRef<string | null>(isEdit ? (noteId ?? null) : null);
   const statusRef = useRef<NoteStatus>("draft");
@@ -202,6 +204,33 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
     router.push("/");
   }
 
+  async function handleRegenerateSummary() {
+    const id = idRef.current;
+    if (!id) return;
+    setRegenerating(true);
+    try {
+      const note = await api.regenerateLinkSummary(id);
+      setContentHtml(note.contentHtml);
+      const snap = serialize(
+        note.title,
+        note.contentHtml,
+        note.tags,
+        note.images,
+        note.attachments ?? [],
+        note.links.map((l) => l.url),
+      );
+      setSavedSnapshot(snap);
+      savedRef.current = snap;
+      setSaveState("saved");
+      setConfirmRegenerate(false);
+    } catch {
+      setSaveState("error");
+      setConfirmRegenerate(false);
+    } finally {
+      setRegenerating(false);
+    }
+  }
+
   // --- États de chargement / erreur (édition) ---
   if (isEdit && loadError) {
     const forbidden =
@@ -295,6 +324,21 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Liens</label>
           <LinkManager links={links} onChange={setLinks} />
+          {isEdit && links.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setConfirmRegenerate(true)}
+              disabled={regenerating || submitting}
+              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700 transition hover:bg-brand-100 focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {regenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
+              )}
+              Regénérer le résumé du lien
+            </button>
+          )}
         </div>
 
         <div>
@@ -360,6 +404,18 @@ export function NoteEditor({ mode, noteId }: NoteEditorProps) {
         danger
         onConfirm={() => router.push("/")}
         onCancel={() => setConfirmCancel(false)}
+      />
+
+      <ConfirmDialog
+        open={confirmRegenerate}
+        title="Regénérer le résumé du lien"
+        message="Le contenu actuel sera remplacé par un nouveau résumé automatique du lien externe. Cette action est irréversible."
+        confirmLabel="Regénérer"
+        cancelLabel="Annuler"
+        danger
+        busy={regenerating}
+        onConfirm={() => void handleRegenerateSummary()}
+        onCancel={() => setConfirmRegenerate(false)}
       />
     </form>
   );
