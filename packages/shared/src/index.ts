@@ -188,6 +188,12 @@ export interface Notification {
   createdAt: string;
 }
 
+/** Utilisateur le plus actif (classement par nombre de notes publiées). */
+export interface TopContributor {
+  user: UserPublic;
+  stats: UserSelf["stats"];
+}
+
 // ---------------------------------------------------------------------------
 // Payloads de requête
 // ---------------------------------------------------------------------------

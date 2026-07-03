@@ -12,6 +12,7 @@ import { tagsRoutes } from "./routes/tags.js";
 import { notificationsRoutes } from "./routes/notifications.js";
 import { uploadsRoutes } from "./routes/uploads.js";
 import { ogRoutes } from "./routes/og.js";
+import { statsRoutes } from "./routes/stats.js";
 
 const app = new Hono<AppEnv>();
 
@@ -44,6 +45,7 @@ app.use("/tags/*", requireAuth);
 app.use("/notifications/*", requireAuth);
 app.use("/uploads/*", requireAuth);
 app.use("/og/*", requireAuth);
+app.use("/stats/*", requireAuth);
 
 app.route("/users", usersRoutes);
 app.route("/notes", notesRoutes);
@@ -53,6 +55,7 @@ app.route("/tags", tagsRoutes);
 app.route("/notifications", notificationsRoutes);
 app.route("/uploads", uploadsRoutes);
 app.route("/og", ogRoutes);
+app.route("/stats", statsRoutes);
 
 export const handler = handle(app);
 export { app };

@@ -12,6 +12,7 @@ import { NoteModal } from "@/components/NoteModal";
 import { EmptyState } from "@/components/EmptyState";
 import { Spinner } from "@/components/Spinner";
 import { noteQueryToSearchParams, parseNoteQueryFromSearchParams } from "@/lib/note-query-url";
+import { TopContributorBanner } from "@/components/TopContributorBanner";
 
 interface NotesDashboardProps {
   openNoteId?: string;
@@ -103,9 +104,26 @@ export function NotesDashboard({ openNoteId, initialTag }: NotesDashboardProps) 
   const loadingMore = isValidating && Boolean(query.cursor);
   const firstLoading = isLoading && items.length === 0;
 
+  const isHome = !initialTag && !openNoteId;
+  const hasFilters = Boolean(
+    filterQuery.q ||
+      filterQuery.authorId ||
+      filterQuery.mine ||
+      filterQuery.dateFrom ||
+      filterQuery.dateTo ||
+      (filterQuery.tags?.length ?? 0) > 0 ||
+      (filterQuery.sort && filterQuery.sort !== "recent"),
+  );
+
   return (
     <section aria-label="Tableau de bord des notes" className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <SearchFilters query={filterQuery} onChange={applyQuery} tags={tags ?? []} users={users} />
+
+      {isHome && !hasFilters && (
+        <TopContributorBanner
+          onSelectAuthor={(authorId) => applyQuery({ ...filterQuery, authorId })}
+        />
+      )}
 
       {firstLoading ? (
         <div className="flex justify-center py-20" aria-live="polite">

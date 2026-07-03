@@ -19,6 +19,7 @@ import type {
   PresignUploadInput,
   PresignUploadResult,
   Tag,
+  TopContributor,
   UpdateProfileInput,
   UpdateUserInput,
   UserAdmin,
@@ -181,6 +182,9 @@ export const api = {
   deleteComment: (id: string) => request<void>(`/comments/item/${id}`, { method: "DELETE" }),
   toggleReaction: (id: string, emoji: string) =>
     request<Comment>(`/comments/item/${id}/reactions`, { method: "POST", body: { emoji } }),
+
+  // --- Stats ---
+  getTopContributor: () => request<TopContributor | null>("/stats/top-contributor"),
 
   // --- Tags ---
   listTags: () => request<Tag[]>("/tags"),
