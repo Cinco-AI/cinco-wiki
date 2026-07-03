@@ -34,19 +34,3 @@ export function composeContentHtml(bodyHtml: string, summaryHtml?: string): stri
   return `${summaryBlock}\n${body}`;
 }
 
-/**
- * Conserve le bloc résumé de lien lors d'une mise à jour,
- * même si l'auteur retire le lien ou modifie le corps.
- */
-export function preserveContentHtmlPrefix(
-  existingContentHtml: string,
-  newContentHtml: string,
-): string {
-  const { summaryHtml } = extractLinkSummaryHtml(existingContentHtml);
-  const { bodyHtml: newBody } = extractLinkSummaryHtml(newContentHtml);
-  if (summaryHtml) {
-    const body = newBody.trim();
-    return body ? `${summaryHtml}\n${body}` : summaryHtml;
-  }
-  return newContentHtml.trim();
-}

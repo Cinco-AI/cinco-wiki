@@ -14,7 +14,7 @@ import { body, errors, HttpError, oid, type AppEnv } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";
 import { sanitizeContent } from "../lib/sanitize.js";
 import { toNote, toNoteCard } from "../models/index.js";
-import { composeContentHtml, preserveContentHtmlPrefix } from "../lib/content-html.js";
+import { composeContentHtml } from "../lib/content-html.js";
 import { summarizeExternalLink } from "../lib/link-summarizer-client.js";
 import { createNotification } from "../routes/notifications.js";
 import { fetchOgPreview } from "../routes/og.js";
@@ -379,8 +379,7 @@ notesRoutes.put("/:id", async (c) => {
   const links = await resolveLinks(input.links);
   const images = [...input.images].sort((a, b) => a.order - b.order);
   const attachments = input.attachments;
-  const sanitizedBody = sanitizeContent(input.contentHtml);
-  const contentHtml = preserveContentHtmlPrefix(note.contentHtml, sanitizedBody);
+  const contentHtml = sanitizeContent(input.contentHtml);
   const now = new Date();
 
   await collections.notes(db).updateOne(
