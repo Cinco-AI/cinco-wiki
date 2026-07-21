@@ -17,14 +17,20 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build:shared": "npm run build --workspace packages/shared",
     "frontend": "npm run dev --workspace packages/frontend",
-    "seed:admin": "node scripts/seed-admin.mjs"
+    "seed:admin": "node scripts/seed-admin.mjs",
+    "qdrant:up": "docker compose -f docker-compose.rag.yml up -d",
+    "qdrant:down": "docker compose -f docker-compose.rag.yml down",
+    "rag:prod:up": "docker compose -f docker-compose.rag.prod.yml --env-file .env.rag.prod up -d",
+    "rag:prod:down": "docker compose -f docker-compose.rag.prod.yml --env-file .env.rag.prod down",
+    "rag:sync": "tsx packages/backend/src/scripts/rag-sync.ts"
   },
   "devDependencies": {
     "esbuild": "^0.24.2",
     "serverless": "^3.40.0",
     "serverless-esbuild": "^1.55.0",
-    "serverless-python-requirements": "^6.1.0",
     "serverless-offline": "^13.9.0",
+    "serverless-python-requirements": "^6.1.0",
+    "tsx": "^4.23.1",
     "typescript": "^5.6.3"
   },
   "packageManager": "npm@11.6.2"

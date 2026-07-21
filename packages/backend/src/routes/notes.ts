@@ -16,6 +16,10 @@ import { sanitizeContent } from "../lib/sanitize.js";
 import { toNote, toNoteCard } from "../models/index.js";
 import { composeContentHtml } from "../lib/content-html.js";
 import { summarizeExternalLink } from "../lib/link-summarizer-client.js";
+import {
+  scheduleNoteIndexDelete,
+  scheduleNoteIndexUpsert,
+} from "../rag/notify.js";
 import { createNotification } from "../routes/notifications.js";
 import { fetchOgPreview } from "../routes/og.js";
 
@@ -338,6 +342,7 @@ notesRoutes.post("/", async (c) => {
 
   await collections.notes(db).insertOne(doc);
   await adjustTagCounts(db, tags, 1);
+  scheduleNoteIndexUpsert(db, doc._id.toHexString());
 
   if (linkSummaryFailed) {
     await createNotification(
@@ -416,6 +421,8 @@ notesRoutes.put("/:id", async (c) => {
     updatedAt: now,
   };
 
+  scheduleNoteIndexUpsert(db, id.toHexString());
+
   const resolve = await authorResolver(db, [updated.authorId]);
   const myVote = await myVoteValue(db, id, meId);
   return c.json(toNote(updated, resolve(updated.authorId), myVote) satisfies Note);
@@ -471,6 +478,7 @@ notesRoutes.post("/:id/regenerate-link-summary", async (c) => {
   );
 
   const updated: NoteDoc = { ...note, contentHtml, updatedAt: now };
+  scheduleNoteIndexUpsert(db, id.toHexString());
   const resolve = await authorResolver(db, [updated.authorId]);
   const myVote = await myVoteValue(db, id, meId);
   return c.json(toNote(updated, resolve(updated.authorId), myVote) satisfies Note);
@@ -496,6 +504,7 @@ notesRoutes.delete("/:id", async (c) => {
   ]);
   await adjustTagCounts(db, note.tags, -1);
   await collections.notes(db).deleteOne({ _id: id });
+  scheduleNoteIndexDelete(db, id.toHexString());
 
   return c.body(null, 204);
 });

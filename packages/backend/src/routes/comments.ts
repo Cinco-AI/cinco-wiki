@@ -13,6 +13,7 @@ import {
 } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";
 import { toComment, toUserPublic } from "../models/index.js";
+import { scheduleNoteSocialSync } from "../rag/notify.js";
 import { createNotification } from "../routes/notifications.js";
 
 export const commentsRoutes = new Hono<AppEnv>();
@@ -92,6 +93,7 @@ commentsRoutes.post("/:noteId", async (c) => {
     );
   }
 
+  scheduleNoteSocialSync(db, noteId.toHexString());
   return c.json(toComment(doc, toUserPublic(user), c.get("userId")), 201);
 });
 
@@ -110,6 +112,7 @@ commentsRoutes.put("/item/:id", async (c) => {
 
   const updatedAt = new Date();
   await collections.comments(db).updateOne({ _id: id }, { $set: { text, updatedAt } });
+  scheduleNoteSocialSync(db, comment.noteId.toHexString());
   return c.json(toComment({ ...comment, text, updatedAt }, toUserPublic(user), c.get("userId")));
 });
 
@@ -143,6 +146,7 @@ commentsRoutes.post("/item/:id/reactions", async (c) => {
   const next = reactions.filter((r) => r.userIds.length > 0);
 
   await collections.comments(db).updateOne({ _id: id }, { $set: { reactions: next } });
+  scheduleNoteSocialSync(db, comment.noteId.toHexString());
 
   const resolve = await authorResolver(
     db,
@@ -174,6 +178,7 @@ commentsRoutes.delete("/item/:id", async (c) => {
   await collections.comments(db).deleteOne({ _id: id });
   if (note) {
     await collections.notes(db).updateOne({ _id: note._id }, { $inc: { commentCount: -1 } });
+    scheduleNoteSocialSync(db, note._id.toHexString());
   }
   return c.body(null, 204);
 });

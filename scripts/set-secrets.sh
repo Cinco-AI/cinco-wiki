@@ -23,7 +23,12 @@
 #   JWT_SECRET    (requis)  -> SecureString
 #   MONGODB_DB    (optionnel, défaut "cinco-wiki")
 #   CORS_ORIGINS      (optionnel, défaut "*")
-#   OPENAI_API_KEY    (optionnel) -> SecureString — résumé de liens externes
+#   OPENAI_API_KEY    (optionnel) -> SecureString — résumé de liens + chat RAG
+#   QDRANT_URL        (optionnel) -> String — URL HTTPS Qdrant (VPS)
+#   QDRANT_API_KEY    (optionnel) -> SecureString
+#   QDRANT_COLLECTION (optionnel) -> String — défaut cinco_wiki
+#   LLM_PROVIDER      (optionnel) -> String — openai | openrouter
+#   CHAT_MODEL / EMBEDDING_MODEL (optionnel)
 set -euo pipefail
 
 STAGE="${1:-dev}"
@@ -59,4 +64,10 @@ put JWT_SECRET   "${JWT_SECRET:-}"             SecureString
 put MONGODB_DB   "${MONGODB_DB:-cinco-wiki}"   String
 put CORS_ORIGINS "${CORS_ORIGINS:-*}"          String
 put OPENAI_API_KEY "${OPENAI_API_KEY:-}"       SecureString
+put QDRANT_URL     "${QDRANT_URL:-}"           String
+put QDRANT_API_KEY "${QDRANT_API_KEY:-}"       SecureString
+put QDRANT_COLLECTION "${QDRANT_COLLECTION:-cinco_wiki}" String
+put LLM_PROVIDER   "${LLM_PROVIDER:-openai}"   String
+put CHAT_MODEL     "${CHAT_MODEL:-gpt-4o-mini}" String
+put EMBEDDING_MODEL "${EMBEDDING_MODEL:-text-embedding-3-small}" String
 echo "OK"

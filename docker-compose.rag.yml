@@ -1,0 +1,33 @@
+# Qdrant + Neo4j — DEV local. La logique RAG vit dans packages/backend (Lambda).
+# Prod VPS : utiliser docker-compose.rag.prod.yml (+ .env.rag.prod.example).
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.14.0
+    ports:
+      # Local only — en prod, bind 127.0.0.1 et terminer TLS devant
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_wiki_data:/qdrant/storage
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-changeme}
+    volumes:
+      - neo4j_wiki_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  qdrant_wiki_data:
+  neo4j_wiki_data:

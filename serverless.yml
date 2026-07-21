@@ -8,7 +8,10 @@
 #   /cinco-wiki/<stage>/JWT_SECRET    (SecureString, requis)
 #   /cinco-wiki/<stage>/MONGODB_DB    (String, défaut "cinco-wiki")
 #   /cinco-wiki/<stage>/CORS_ORIGINS  (String, défaut "*")
-#   /cinco-wiki/<stage>/OPENAI_API_KEY (SecureString, optionnel — résumé de liens)
+#   /cinco-wiki/<stage>/OPENAI_API_KEY (SecureString, optionnel — résumé de liens + RAG)
+#   /cinco-wiki/<stage>/QDRANT_URL       (String, optionnel — URL Qdrant VPS)
+#   /cinco-wiki/<stage>/QDRANT_API_KEY   (SecureString, optionnel)
+#   /cinco-wiki/<stage>/QDRANT_COLLECTION (String, optionnel, défaut cinco_wiki)
 
 service: cinco-wiki
 
@@ -39,6 +42,13 @@ provider:
     JWT_SECRET: ${ssm:/cinco-wiki/${sls:stage}/JWT_SECRET}
     CORS_ORIGINS: ${ssm:/cinco-wiki/${sls:stage}/CORS_ORIGINS, '*'}
     BUCKET_NAME: ${self:custom.bucketName}
+    QDRANT_URL: ${ssm:/cinco-wiki/${sls:stage}/QDRANT_URL, ''}
+    QDRANT_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/QDRANT_API_KEY, ''}
+    QDRANT_COLLECTION: ${ssm:/cinco-wiki/${sls:stage}/QDRANT_COLLECTION, 'cinco_wiki'}
+    OPENAI_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/OPENAI_API_KEY, ''}
+    LLM_PROVIDER: ${ssm:/cinco-wiki/${sls:stage}/LLM_PROVIDER, 'openai'}
+    CHAT_MODEL: ${ssm:/cinco-wiki/${sls:stage}/CHAT_MODEL, 'gpt-4o-mini'}
+    EMBEDDING_MODEL: ${ssm:/cinco-wiki/${sls:stage}/EMBEDDING_MODEL, 'text-embedding-3-small'}
   iam:
     role:
       statements:
@@ -65,10 +75,10 @@ custom:
     slim: true
     zip: true
     pipCmdExtraArgs:
-      - '--platform=manylinux2014_aarch64'
-      - '--python-version=3.11'
-      - '--implementation=cp'
-      - '--only-binary=:all:'
+      - "--platform=manylinux2014_aarch64"
+      - "--python-version=3.11"
+      - "--implementation=cp"
+      - "--only-binary=:all:"
   esbuild:
     bundle: true
     minify: false
@@ -85,7 +95,7 @@ functions:
       LINK_SUMMARIZER_FUNCTION: ${self:service}-${sls:stage}-linkSummarizer
     # Catch-all : toutes les méthodes / tous les chemins → router interne Hono.
     events:
-      - httpApi: '*'
+      - httpApi: "*"
 
   linkSummarizer:
     handler: handler.summarize
@@ -98,8 +108,8 @@ functions:
     # remonte ensuite lambdas/link-summarizer/* à la racine (moveModuleUp).
     package:
       patterns:
-        - '!**'
-        - 'lambdas/link-summarizer/**'
+        - "!**"
+        - "lambdas/link-summarizer/**"
     environment:
       OPENAI_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/OPENAI_API_KEY, ''}
 
@@ -121,9 +131,9 @@ resources:
         # Upload navigateur → S3 via URL pré-signée PUT (cf. ImageUploader.tsx).
         CorsConfiguration:
           CorsRules:
-            - AllowedHeaders: ['*']
+            - AllowedHeaders: ["*"]
               AllowedMethods: [GET, PUT, HEAD]
-              AllowedOrigins: ['*']
+              AllowedOrigins: ["*"]
               # Propriété CloudFormation = MaxAge (MaxAgeSeconds est le nom de
               # l'API REST S3, rejeté par AWS::EarlyValidation::PropertyValidation).
               MaxAge: 3000
@@ -136,7 +146,7 @@ resources:
           Statement:
             - Sid: PublicReadGetObject
               Effect: Allow
-              Principal: '*'
+              Principal: "*"
               Action: s3:GetObject
               Resource: arn:aws:s3:::${self:custom.bucketName}/*
   Outputs:

@@ -1,7 +1,8 @@
 # Cinco Wiki
 
 Application web collaborative de prise de notes — espace commun, notes en rich-text,
-votes (étoiles), commentaires, tags, recherche full-text. Cf. `Cinco_Wiki_Spec_Fonctionnelle.md`.
+votes (étoiles), commentaires, tags, recherche full-text, assistant **GraphRAG** sur `/ask`.
+Cf. `Cinco_Wiki_Spec_Fonctionnelle.md`.
 
 ## Architecture
 
@@ -9,20 +10,25 @@ Monorepo npm workspaces, deux déployables :
 
 ```
 Netlify                         AWS eu-west-3 (Serverless Framework)
-┌─────────────┐   REST/JWT      ┌──────────────────────────────┐
-│  Next.js    │ ───────────────►│  API Gateway → Lambda (Hono)  │
-│ (frontend)  │                 │     ├── MongoDB Atlas          │
-└─────────────┘                 │     └── S3 (images)            │
-                                └──────────────────────────────┘
+┌─────────────┐   REST/JWT      ┌──────────────────────────────────┐
+│  Next.js    │ ───────────────►│  API Gateway → Lambda (Hono)      │
+│ (frontend)  │                 │     ├── MongoDB Atlas              │
+└─────────────┘                 │     ├── S3 (images)                │
+                                │     ├── Qdrant (vecteurs, opt.)    │
+                                │     └── Neo4j (graphe, opt.)       │
+                                └──────────────────────────────────┘
 ```
 
 | Package | Rôle |
 |---|---|
 | `packages/shared` | Contrat d'API : types + règles (`LIMITS`, helpers). Source de vérité. |
-| `packages/backend` | App Hono unique sur Lambda (router interne), MongoDB, S3, OG. |
+| `packages/backend` | App Hono unique sur Lambda (router interne), MongoDB, S3, OG, GraphRAG. |
 | `packages/frontend` | Next.js App Router + Tailwind + TipTap + SWR. |
 
 - `serverless.yml` — infra backend (API Gateway HTTP API, Lambda, S3, IAM).
+- `docker-compose.rag.yml` — Qdrant + Neo4j **locaux** (dev, assistant `/ask`).
+- `docker-compose.rag.prod.yml` — même stack **prod VPS** (bind 127.0.0.1, API key, limits).
+- `.env.rag.prod.example` — secrets / tuning pour le compose prod.
 - `docs/CONTRACT_API.md` — règles métier par endpoint.
 - `docs/CONTRACT_FRONTEND.md` — props des composants + routing.
 
@@ -32,6 +38,7 @@ Netlify                         AWS eu-west-3 (Serverless Framework)
 - Un cluster **MongoDB Atlas** (URI), idéalement avec un index Atlas Search.
 - Compte AWS configuré (`aws configure`) pour le déploiement.
 - Serverless Framework v3 (installé en devDependency ; pas de compte requis).
+- **Docker** (optionnel) — Qdrant + Neo4j pour l'assistant GraphRAG (`npm run qdrant:up`).
 
 ## Installation
 
@@ -58,6 +65,19 @@ Détail des paramètres SSM créés :
 | `JWT_SECRET` | `/cinco-wiki/<stage>/JWT_SECRET` | SecureString |
 | `MONGODB_DB` | `/cinco-wiki/<stage>/MONGODB_DB` | String (défaut `cinco-wiki`) |
 | `CORS_ORIGINS` | `/cinco-wiki/<stage>/CORS_ORIGINS` | String (défaut `*`) |
+| `QDRANT_URL` | `/cinco-wiki/<stage>/QDRANT_URL` | String (optionnel — RAG) |
+| `QDRANT_API_KEY` | `/cinco-wiki/<stage>/QDRANT_API_KEY` | SecureString (optionnel) |
+| `QDRANT_COLLECTION` | `/cinco-wiki/<stage>/QDRANT_COLLECTION` | String (défaut `cinco_wiki`) |
+| `OPENAI_API_KEY` | `/cinco-wiki/<stage>/OPENAI_API_KEY` | SecureString (résumé liens + RAG) |
+
+Variables GraphRAG locales (`.env`, non poussées par défaut via SSM sauf si vous les ajoutez) :
+
+| Variable | Rôle |
+|---|---|
+| `NEO4J_URI` | Bolt URI (ex. `bolt://localhost:7687`) |
+| `NEO4J_USER` / `NEO4J_PASSWORD` | Auth Neo4j |
+| `LLM_PROVIDER` | `openai` \| `openrouter` |
+| `EMBEDDING_MODEL` / `CHAT_MODEL` | Modèles embeddings / chat |
 
 `BUCKET_NAME` est dérivé automatiquement (`cinco-wiki-uploads-<stage>`) ;
 surchargeable via `--param="bucketName=..."`.
@@ -102,11 +122,101 @@ La sortie de `serverless deploy` affiche l'URL de l'API (à reporter dans
 ```bash
 cd packages/frontend
 cp .env.local.example .env.local   # renseigner NEXT_PUBLIC_API_URL (URL de l'API déployée)
-npm run dev                        # http://localhost:3000
+npm run frontend                   # depuis la racine — ou npm run dev dans packages/frontend
 ```
 
 Déploiement Netlify : base `packages/frontend`, plugin `@netlify/plugin-nextjs`
 (cf. `packages/frontend/netlify.toml`). Définir `NEXT_PUBLIC_API_URL` dans l'env Netlify.
+
+## Assistant GraphRAG (optionnel)
+
+Chat sur les notes publiées via `/ask` (`POST /rag/chat`). Code dans
+`packages/backend/src/rag`.
+
+| Store | Rôle |
+|-------|------|
+| **Qdrant** | Recherche sémantique (chunks de notes publiées) |
+| **Neo4j** | Graphe social : auteurs, tags, liens, votes, commentaires |
+
+Sans `QDRANT_URL` / clé LLM, l'assistant est désactivé — le reste du wiki fonctionne.
+Sans Neo4j (`NEO4J_*`), le chat vectoriel reste disponible ; les tools graphe sont no-op.
+
+### Démarrage local
+
+```bash
+npm run qdrant:up
+# .env : QDRANT_URL, OPENAI_API_KEY, NEO4J_URI/USER/PASSWORD (+ MONGODB_URI, JWT_SECRET…)
+npm run rag:sync          # MongoDB → Qdrant + Neo4j
+npm run dev               # API backend
+npm run frontend          # UI /ask
+```
+
+Ports locaux (compose) :
+
+| Service | URL |
+|---------|-----|
+| Qdrant HTTP | http://localhost:6333 |
+| Neo4j Browser | http://localhost:7474 |
+| Neo4j Bolt | `bolt://localhost:7687` |
+
+> En local, ne laissez **pas** `QDRANT_API_KEY` défini avec une valeur vide si le
+> conteneur active l'auth : laissez la variable absente, ou alignez la clé côté client
+> et serveur.
+
+### Sync
+
+- **Full** : `npm run rag:sync` (notes publiées → embeddings Qdrant + graphe Neo4j).
+- **Incrémental notes** : create/update/unpublish → index Qdrant + structure graphe.
+- **Incrémental social** : votes / commentaires / réactions → arêtes Neo4j + stats payload Qdrant (sans re-embed).
+
+| Script | Action |
+|--------|--------|
+| `npm run qdrant:up` | Démarre Qdrant + Neo4j (Docker **dev**) |
+| `npm run qdrant:down` | Arrête la stack RAG dev |
+| `npm run rag:prod:up` | Démarre la stack **prod** (`docker-compose.rag.prod.yml` + `.env.rag.prod`) |
+| `npm run rag:prod:down` | Arrête la stack prod |
+| `npm run rag:sync` | Reindex complet (CLI, sans JWT) |
+| `npm run rag:sync -- --note-id <id>` | Sync d'une note publiée |
+| `npm run rag:sync -- --delete-note <id>` | Purge Qdrant (+ graphe) d'une note |
+
+### Déploiement VPS (modèle prod)
+
+Même services que le compose dev ; seuls 3 secrets dans `.env.rag.prod` :
+
+```bash
+cp .env.rag.prod.example .env.rag.prod
+# QDRANT_API_KEY / NEO4J_USER / NEO4J_PASSWORD
+npm run rag:prod:up
+```
+
+Ports bindés sur `127.0.0.1` uniquement. TLS (Nginx/Caddy) → Qdrant `:6333` si besoin.
+Fichier : [`docker-compose.rag.prod.yml`](docker-compose.rag.prod.yml).
+
+### Outils agent & MCP
+
+L'agent (`POST /rag/chat`) et le serveur MCP HTTP (auth JWT, préfixe `/rag`) partagent
+les mêmes tools (`packages/backend/src/rag/catalog/tools.ts`) :
+
+| Intention | Tool |
+|-----------|------|
+| Contenu / sens | `searchNotes`, `getNote` |
+| Tags / exploration | `listTags`, `listRecentNotes` |
+| Liens / tags partagés | `relatedNotes`, `notesBySharedTags`, `graphPath` |
+| Classements | `topRatedNotes`, `mostCommentedNotes` |
+| Auteurs | `notesByAuthor`, `authorsByTag` |
+| Votes | `noteRatings`, `notesRatedByUser` |
+| Commentaires | `noteComments`, `notesCommentedByUser` |
+
+Endpoints MCP :
+
+```
+GET  /rag/mcp
+GET  /rag/mcp/tools
+POST /rag/mcp/tools/:name
+POST /rag/mcp                 # JSON-RPC : initialize | tools/list | tools/call
+```
+
+Health : `GET /rag/health` → `{ qdrant, neo4j, graphConfigured }`.
 
 ## Amorçage du premier admin
 

@@ -13,6 +13,7 @@ import {
 } from "../lib/http.js";
 import { authorResolver } from "../lib/relations.js";
 import { toNote } from "../models/index.js";
+import { scheduleNoteSocialSync } from "../rag/notify.js";
 import { createNotification } from "../routes/notifications.js";
 
 export const votesRoutes = new Hono<AppEnv>();
@@ -81,7 +82,9 @@ votesRoutes.put("/:noteId", async (c) => {
     );
   }
 
-  return c.json(await recalcAndBuild(db, noteId, userId));
+  const result = await recalcAndBuild(db, noteId, userId);
+  scheduleNoteSocialSync(db, noteId.toHexString());
+  return c.json(result);
 });
 
 // DELETE /votes/:noteId — retire le vote du courant, recalcule.
@@ -95,5 +98,7 @@ votesRoutes.delete("/:noteId", async (c) => {
 
   await collections.votes(db).deleteOne({ noteId, userId });
 
-  return c.json(await recalcAndBuild(db, noteId, userId));
+  const result = await recalcAndBuild(db, noteId, userId);
+  scheduleNoteSocialSync(db, noteId.toHexString());
+  return c.json(result);
 });

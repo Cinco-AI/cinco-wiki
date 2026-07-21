@@ -46,6 +46,10 @@ export interface NoteDoc {
   commentCount: number;
   createdAt: Date;
   updatedAt: Date;
+  /** Interne RAG — dernière indexation Qdrant réussie (non exposé au client). */
+  ragIndexedAt?: Date | null;
+  /** Interne RAG — dernier échec d'indexation (non exposé au client). */
+  ragIndexError?: string | null;
 }
 
 export interface VoteDoc {
