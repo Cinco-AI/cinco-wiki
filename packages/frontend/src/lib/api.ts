@@ -56,6 +56,9 @@ export const tokenStore = {
     accessToken = null;
     if (typeof window !== "undefined") localStorage.removeItem(REFRESH_KEY);
   },
+  getAccess(): string | null {
+    return accessToken;
+  },
   getRefresh(): string | null {
     return typeof window !== "undefined" ? localStorage.getItem(REFRESH_KEY) : null;
   },

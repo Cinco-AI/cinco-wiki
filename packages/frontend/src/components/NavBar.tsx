@@ -7,6 +7,7 @@ import {
   FileText,
   LogOut,
   Menu,
+  MessageSquare,
   Plus,
   Search,
   Shield,
@@ -116,6 +117,13 @@ export function NavBar() {
 
         {/* Actions (desktop) */}
         <div className="ml-auto hidden items-center gap-2 md:flex">
+          <Link
+            href="/ask"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
+          >
+            <MessageSquare className="h-4 w-4" aria-hidden />
+            Assistant
+          </Link>
           <Link
             href="/notes/new"
             className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
@@ -229,6 +237,9 @@ export function NavBar() {
           </div>
 
           <div className="flex flex-col py-1">
+            <MobileLink href="/ask" icon={MessageSquare} onSelect={() => setMobileOpen(false)}>
+              Assistant
+            </MobileLink>
             <MobileLink href="/notes/new" icon={Plus} onSelect={() => setMobileOpen(false)}>
               Nouvelle note
             </MobileLink>
