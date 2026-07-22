@@ -5,6 +5,7 @@ import {
   authorsByTag,
   getNote,
   graphPath,
+  findNotes,
   listRecentNotes,
   listTags,
   mostCommentedNotes,
@@ -16,6 +17,7 @@ import {
   notesRatedByUser,
   relatedNotes,
   searchNotes,
+  topContributors,
   topRatedNotes,
 } from "../catalog/tools.js";
 import type { AppEnv } from "../../lib/http.js";
@@ -58,8 +60,25 @@ export const MCP_TOOLS = [
     inputSchema: { type: "object", properties: {} },
   },
   {
+    name: "findNotes",
+    description:
+      "List published notes with structured filters (sinceDays, linkHost e.g. youtube.com, sort, limit)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        sinceDays: { type: "number" },
+        linkHost: { type: "string" },
+        sort: {
+          type: "string",
+          enum: ["createdAt", "avgRating", "commentCount"],
+        },
+        limit: { type: "number" },
+      },
+    },
+  },
+  {
     name: "listRecentNotes",
-    description: "List a sample of indexed notes",
+    description: "Alias of findNotes({ sort: createdAt }) — prefer findNotes",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -97,6 +116,15 @@ export const MCP_TOOLS = [
         to: { type: "string" },
       },
       required: ["from", "to"],
+    },
+  },
+  {
+    name: "topContributors",
+    description:
+      "Rank authors by number of published notes (best contributor / top authors)",
+    inputSchema: {
+      type: "object",
+      properties: { limit: { type: "number" } },
     },
   },
   {
@@ -203,8 +231,21 @@ async function callTool(
     }
     case "listTags":
       return asText(await listTags(db));
+    case "findNotes": {
+      const parsed = z
+        .object({
+          sinceDays: z.number().optional(),
+          linkHost: z.string().optional(),
+          sort: z
+            .enum(["createdAt", "avgRating", "commentCount"])
+            .optional(),
+          limit: z.number().optional(),
+        })
+        .parse(args);
+      return asText(await findNotes(db, parsed));
+    }
     case "listRecentNotes":
-      return asText(await listRecentNotes());
+      return asText(await listRecentNotes(db));
     case "relatedNotes": {
       const parsed = z
         .object({
@@ -231,6 +272,10 @@ async function callTool(
         })
         .parse(args);
       return asText(await graphPath(parsed));
+    }
+    case "topContributors": {
+      const parsed = z.object({ limit: z.number().optional() }).parse(args);
+      return asText(await topContributors(db, parsed));
     }
     case "topRatedNotes": {
       const parsed = z

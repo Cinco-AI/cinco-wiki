@@ -62,6 +62,38 @@ export function noResultAnswer(locale?: string | null): string {
     : NO_RESULT_ANSWER_FR;
 }
 
+const TEMP_UNAVAILABLE_FR =
+  "L'assistant est temporairement indisponible. Réessayez dans un instant.";
+
+const TEMP_UNAVAILABLE_EN =
+  "The assistant is temporarily unavailable. Please try again in a moment.";
+
+const RATE_LIMITED_FR =
+  "Trop de questions en peu de temps. Patientez une minute puis réessayez.";
+
+const RATE_LIMITED_EN =
+  "Too many questions in a short time. Please wait a minute and try again.";
+
+const TIMEOUT_FR =
+  "La réponse a pris trop de temps. Reformulez votre question ou réessayez.";
+
+const TIMEOUT_EN =
+  "The answer took too long. Please rephrase your question or try again.";
+
+export function temporaryUnavailableAnswer(locale?: string | null): string {
+  return resolveLocale(locale) === "en"
+    ? TEMP_UNAVAILABLE_EN
+    : TEMP_UNAVAILABLE_FR;
+}
+
+export function rateLimitedAnswer(locale?: string | null): string {
+  return resolveLocale(locale) === "en" ? RATE_LIMITED_EN : RATE_LIMITED_FR;
+}
+
+export function timeoutAnswer(locale?: string | null): string {
+  return resolveLocale(locale) === "en" ? TIMEOUT_EN : TIMEOUT_FR;
+}
+
 export function checkRateLimit(key: string): boolean {
   const now = Date.now();
   const bucket = rateBuckets.get(key);

@@ -15,8 +15,11 @@ import {
   topRatedNotes as queryTopRatedNotes,
 } from "../graph/query.js";
 import {
+  findPublishedNotes,
   listTagNames,
   loadPublishedNoteById,
+  loadTopContributors,
+  type FindNotesArgs,
 } from "../notes-source.js";
 import { findHitsByNoteId, scrollByType } from "../vector/qdrant.js";
 
@@ -147,23 +150,18 @@ export async function listTags(db: Db) {
   return { tags: [...set].sort() };
 }
 
-export async function listRecentNotes() {
-  const hits = await scrollByType("note", 40);
-  const seen = new Set<string>();
-  const notes: Array<{ noteId: string; title: string; urlPath: string }> = [];
+/** Listing notes avec filtres structurés (Mongo — dates, liens, tris). */
+export async function findNotes(db: Db, args: FindNotesArgs = {}) {
+  const result = await findPublishedNotes(db, args);
+  return {
+    ...result,
+    grounded: result.notes.length > 0,
+  };
+}
 
-  for (const hit of hits) {
-    const noteId = String(hit.payload.noteId || "");
-    if (!noteId || seen.has(noteId)) continue;
-    seen.add(noteId);
-    notes.push({
-      noteId,
-      title: displayTitle(hit.payload),
-      urlPath: String(hit.payload.urlPath || `/${noteId}`),
-    });
-  }
-
-  return { notes };
+/** @deprecated Préférer findNotes({ sort: "createdAt" }). Alias de compat. */
+export async function listRecentNotes(db: Db) {
+  return findNotes(db, { sort: "createdAt", limit: 40 });
 }
 
 export async function relatedNotes(args: {
@@ -223,4 +221,12 @@ export async function notesCommentedByUser(args: { nameOrId: string }) {
 
 export async function authorsByTag(args: { tag: string }) {
   return queryAuthorsByTag(args);
+}
+
+export async function topContributors(
+  db: Db,
+  args?: { limit?: number },
+) {
+  const authors = await loadTopContributors(db, args?.limit ?? 10);
+  return { authors, grounded: authors.length > 0 };
 }

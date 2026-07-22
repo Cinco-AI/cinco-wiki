@@ -210,9 +210,11 @@ les mêmes tools (`packages/backend/src/rag/catalog/tools.ts`) :
 | Intention | Tool |
 |-----------|------|
 | Contenu / sens | `searchNotes`, `getNote` |
-| Tags / exploration | `listTags`, `listRecentNotes` |
+| Filtres structurés (date, YouTube, tris) | `findNotes` (`sinceDays`, `linkHost`, `sort`, `limit`) |
+| Tags | `listTags` |
+| Contributeurs | `topContributors` |
 | Liens / tags partagés | `relatedNotes`, `notesBySharedTags`, `graphPath` |
-| Classements | `topRatedNotes`, `mostCommentedNotes` |
+| Classements graphe | `topRatedNotes`, `mostCommentedNotes` (ou `findNotes` + `sort`) |
 | Auteurs | `notesByAuthor`, `authorsByTag` |
 | Votes | `noteRatings`, `notesRatedByUser` |
 | Commentaires | `noteComments`, `notesCommentedByUser` |

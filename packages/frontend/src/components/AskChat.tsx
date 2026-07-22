@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import { AlertCircle, Loader2, Send, Trash2 } from "lucide-react";
@@ -14,6 +13,57 @@ type ChatMessage = {
   role: ChatRole;
   content: string;
 };
+
+const CHAT_STORAGE_KEY = "cinco-wiki:ask-chat";
+
+function loadStoredMessages(): ChatMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (m): m is ChatMessage =>
+        !!m &&
+        typeof m === "object" &&
+        typeof (m as ChatMessage).id === "string" &&
+        ((m as ChatMessage).role === "user" ||
+          (m as ChatMessage).role === "assistant") &&
+        typeof (m as ChatMessage).content === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function persistMessages(messages: ChatMessage[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (messages.length === 0) {
+      sessionStorage.removeItem(CHAT_STORAGE_KEY);
+    } else {
+      sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+    }
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+function friendlyChatError(code?: string | null): string {
+  switch (code) {
+    case "RAG_RATE_LIMITED":
+      return "Trop de questions en peu de temps. Patientez une minute puis réessayez.";
+    case "RAG_TIMEOUT":
+      return "La réponse a pris trop de temps. Reformulez votre question ou réessayez.";
+    case "RAG_UNAVAILABLE":
+      return "L'assistant est temporairement indisponible. Réessayez dans un instant.";
+    case "RAG_DISABLED":
+      return "L'assistant n'est pas configuré pour le moment.";
+    default:
+      return code || "Une erreur est survenue. Réessayez.";
+  }
+}
 
 /** Relative note path, or absolute URL whose path is a Mongo ObjectId note. */
 function noteInternalPath(href?: string): string | null {
@@ -36,19 +86,10 @@ function MarkdownLink({
   children?: ReactNode;
 }) {
   const internal = noteInternalPath(href);
-  if (internal) {
-    return (
-      <Link
-        href={internal}
-        className="font-medium text-brand-600 underline-offset-2 hover:underline"
-      >
-        {children}
-      </Link>
-    );
-  }
+  const resolved = internal ?? href;
   return (
     <a
-      href={href}
+      href={resolved}
       target="_blank"
       rel="noopener noreferrer"
       className="font-medium text-brand-600 underline-offset-2 hover:underline"
@@ -65,11 +106,17 @@ function newId(): string {
 }
 
 export function AskChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() =>
+    loadStoredMessages(),
+  );
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    persistMessages(messages);
+  }, [messages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,8 +147,20 @@ export function AskChat() {
         },
       });
 
+      if (res.answer) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: newId(),
+            role: "assistant",
+            content: res.answer || "Aucune réponse.",
+          },
+        ]);
+        return;
+      }
+
       if (!res.available || res.error) {
-        setError(res.error || "RAG_UNAVAILABLE");
+        setError(friendlyChatError(res.error || "RAG_UNAVAILABLE"));
         return;
       }
 
@@ -110,7 +169,7 @@ export function AskChat() {
         {
           id: newId(),
           role: "assistant",
-          content: res.answer || "Aucune réponse.",
+          content: "Aucune réponse.",
         },
       ]);
     } catch (err) {
@@ -145,6 +204,7 @@ export function AskChat() {
           onClick={() => {
             setMessages([]);
             setError(null);
+            persistMessages([]);
           }}
           disabled={busy || messages.length === 0}
           className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 font-medium text-gray-600 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
@@ -157,8 +217,8 @@ export function AskChat() {
       <div className="min-h-[40vh] space-y-4 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         {messages.length === 0 ? (
           <p className="rounded-xl border border-dashed border-gray-200 bg-gray-50/80 px-4 py-6 text-sm text-gray-500">
-            Essayez : « Quelles notes parlent d&apos;onboarding ? » ou « Liste
-            les tags disponibles ».
+            Essayez : « Quelles notes parlent d&apos;onboarding ? » ou « Qui est
+            le meilleur contributeur ? ».
           </p>
         ) : null}
 
