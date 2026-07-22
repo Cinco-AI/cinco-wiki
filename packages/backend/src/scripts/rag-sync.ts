@@ -17,7 +17,7 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { MongoClient } from "mongodb";
-import { isRagConfigured } from "../rag/config.js";
+import { isRagConfigured, ragConfig } from "../rag/config.js";
 import {
   deleteNoteIndex,
   runFullSync,
@@ -75,11 +75,21 @@ async function main() {
     process.exit(1);
   }
 
-  const qdrantOk = await pingQdrant();
-  if (!qdrantOk) {
-    console.error(
-      "Qdrant injoignable. Lancez `npm run qdrant:up` et vérifiez QDRANT_URL.",
-    );
+  const qdrantPing = await pingQdrant();
+  if (!qdrantPing.ok) {
+    const url = ragConfig.qdrantUrl || "(vide)";
+    const hasKey = Boolean(ragConfig.qdrantApiKey);
+    console.error(`Qdrant injoignable (${url}, apiKey=${hasKey ? "oui" : "non"}).`);
+    if (qdrantPing.error) {
+      console.error(`Détail: ${qdrantPing.error}`);
+    }
+    if (url.startsWith("http://localhost") || url.startsWith("http://127.0.0.1")) {
+      console.error("Local: lancez `npm run qdrant:up` et vérifiez QDRANT_URL.");
+    } else {
+      console.error(
+        "Distant: vérifiez QDRANT_URL (HTTPS), QDRANT_API_KEY, et l'accès réseau / reverse proxy.",
+      );
+    }
     process.exit(1);
   }
 

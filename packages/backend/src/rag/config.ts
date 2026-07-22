@@ -53,6 +53,8 @@ export function isLlmConfigured(): boolean {
 export function isGraphConfigured(): boolean {
   return (
     isRagConfigured() &&
-    Boolean(ragConfig.neo4jUri && ragConfig.neo4jUser && ragConfig.neo4jPassword)
+    Boolean(
+      ragConfig.neo4jUri && ragConfig.neo4jUser && ragConfig.neo4jPassword,
+    )
   );
 }

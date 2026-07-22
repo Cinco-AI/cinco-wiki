@@ -21,17 +21,18 @@ function toNote(props: Record<string, unknown>): GraphNote {
     noteId,
     title: String(props.title || noteId),
     urlPath: String(props.urlPath || `/${noteId}`),
-    avgRating:
-      props.avgRating != null ? Number(props.avgRating) : undefined,
-    voteCount:
-      props.voteCount != null ? Number(props.voteCount) : undefined,
+    avgRating: props.avgRating != null ? Number(props.avgRating) : undefined,
+    voteCount: props.voteCount != null ? Number(props.voteCount) : undefined,
     commentCount:
       props.commentCount != null ? Number(props.commentCount) : undefined,
   };
 }
 
 function userName(props: Record<string, unknown>): string {
-  return `${props.firstName || ""} ${props.lastName || ""}`.trim() || String(props.id || "");
+  return (
+    `${props.firstName || ""} ${props.lastName || ""}`.trim() ||
+    String(props.id || "")
+  );
 }
 
 function nodeProps(node: { properties?: Record<string, unknown> } | null) {
@@ -161,9 +162,7 @@ export async function notesBySharedTags(args: {
 
     const notes = result.records.map((r) => {
       const other = toNote(
-        nodeProps(
-          r.get("other") as { properties: Record<string, unknown> },
-        ),
+        nodeProps(r.get("other") as { properties: Record<string, unknown> }),
       );
       const sharedTags = (r.get("sharedTags") as string[]) || [];
       return { ...other, sharedTags };
@@ -339,7 +338,9 @@ export async function topRatedNotes(args: {
         );
     return {
       notes: result.records.map((r) =>
-        toNote(nodeProps(r.get("n") as { properties: Record<string, unknown> })),
+        toNote(
+          nodeProps(r.get("n") as { properties: Record<string, unknown> }),
+        ),
       ),
     };
   } finally {
@@ -366,7 +367,9 @@ export async function mostCommentedNotes(args: {
     );
     return {
       notes: result.records.map((r) =>
-        toNote(nodeProps(r.get("n") as { properties: Record<string, unknown> })),
+        toNote(
+          nodeProps(r.get("n") as { properties: Record<string, unknown> }),
+        ),
       ),
     };
   } finally {
@@ -376,7 +379,11 @@ export async function mostCommentedNotes(args: {
 
 export async function notesByAuthor(args: {
   nameOrId: string;
-}): Promise<{ found: boolean; author: GraphUserRef | null; notes: GraphNote[] }> {
+}): Promise<{
+  found: boolean;
+  author: GraphUserRef | null;
+  notes: GraphNote[];
+}> {
   if (!isGraphConfigured()) {
     return { found: false, author: null, notes: [] };
   }
@@ -397,7 +404,9 @@ export async function notesByAuthor(args: {
       found: true,
       author,
       notes: result.records.map((r) =>
-        toNote(nodeProps(r.get("n") as { properties: Record<string, unknown> })),
+        toNote(
+          nodeProps(r.get("n") as { properties: Record<string, unknown> }),
+        ),
       ),
     };
   } finally {
@@ -405,9 +414,7 @@ export async function notesByAuthor(args: {
   }
 }
 
-export async function noteRatings(args: {
-  noteIdOrTitle: string;
-}): Promise<{
+export async function noteRatings(args: { noteIdOrTitle: string }): Promise<{
   found: boolean;
   note: GraphNote | null;
   avgRating: number;
@@ -580,7 +587,9 @@ export async function notesCommentedByUser(args: {
       found: true,
       user,
       notes: result.records.map((r) =>
-        toNote(nodeProps(r.get("n") as { properties: Record<string, unknown> })),
+        toNote(
+          nodeProps(r.get("n") as { properties: Record<string, unknown> }),
+        ),
       ),
     };
   } finally {
@@ -590,7 +599,10 @@ export async function notesCommentedByUser(args: {
 
 export async function authorsByTag(args: {
   tag: string;
-}): Promise<{ tag: string; authors: Array<GraphUserRef & { noteCount: number }> }> {
+}): Promise<{
+  tag: string;
+  authors: Array<GraphUserRef & { noteCount: number }>;
+}> {
   if (!isGraphConfigured()) {
     return { tag: args.tag, authors: [] };
   }

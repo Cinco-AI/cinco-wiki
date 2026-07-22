@@ -74,7 +74,7 @@ Variables GraphRAG locales (`.env`, non poussées par défaut via SSM sauf si vo
 
 | Variable | Rôle |
 |---|---|
-| `NEO4J_URI` | Bolt URI (ex. `bolt://localhost:7687`) |
+| `NEO4J_URI` | Bolt local (`bolt://localhost:7687`) ou HTTPS Traefik (`https://neo4j.example.com`) |
 | `NEO4J_USER` / `NEO4J_PASSWORD` | Auth Neo4j |
 | `LLM_PROVIDER` | `openai` \| `openrouter` |
 | `EMBEDDING_MODEL` / `CHAT_MODEL` | Modèles embeddings / chat |
@@ -189,8 +189,20 @@ cp .env.rag.prod.example .env.rag.prod
 npm run rag:prod:up
 ```
 
-Ports bindés sur `127.0.0.1` uniquement. TLS (Nginx/Caddy) → Qdrant `:6333` si besoin.
+Ports bindés sur `127.0.0.1` uniquement. TLS (Nginx/Caddy/Traefik) → Qdrant `:6333` si besoin.
 Fichier : [`docker-compose.rag.prod.yml`](docker-compose.rag.prod.yml).
+
+> **`QDRANT_URL` derrière un reverse proxy HTTPS** : utiliser
+> `https://qdrant.example.com` **sans** `:6333`. Le client JS (`@qdrant/js-client-rest`)
+> retombe sinon sur le port 6333 (non exposé publiquement) au lieu de 443.
+> En local : garder `http://localhost:6333`.
+
+> **`NEO4J_URI`** :
+> - Local / Docker : `bolt://localhost:7687` (driver Bolt).
+> - Derrière Traefik/HTTPS (API HTTP Neo4j, port 7474) :
+>   `https://neo4j.example.com` — le backend appelle `/db/neo4j/tx/commit`.
+>   Ne pas utiliser `https://` avec le driver Bolt seul (`Unknown scheme: https`).
+>   Bolt (`:7687`) n’est en général **pas** exposé via Traefik HTTP.
 
 ### Outils agent & MCP
 

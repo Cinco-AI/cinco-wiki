@@ -38,6 +38,8 @@ export type { SyncResult } from "./state.js";
 
 const EMBED_BATCH_SIZE = 32;
 const RETRY_ATTEMPTS = 3;
+/** Fail-soft Neo4j budget so a slow graph sync cannot exhaust the Lambda timeout. */
+const GRAPH_SYNC_TIMEOUT_MS = 12_000;
 
 function emptyCounts(error?: string): SyncResult {
   return {
@@ -125,9 +127,29 @@ export async function runFullSync(db: Db): Promise<SyncResult> {
 
     const documents = notes.flatMap((n) => buildNoteDocuments(n));
 
+    // Qdrant first — Neo4j must not block the vector index under the Lambda budget.
+    const upserted = await embedAndUpsert(documents);
+    const deleted = await pruneOrphans(documents);
+
     if (isGraphConfigured()) {
       try {
-        await upsertNotesGraph(db, notes);
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
+        await Promise.race([
+          upsertNotesGraph(db, notes).finally(() => {
+            if (timeoutId !== undefined) clearTimeout(timeoutId);
+          }),
+          new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(
+              () =>
+                reject(
+                  new Error(
+                    `neo4j sync timed out after ${GRAPH_SYNC_TIMEOUT_MS}ms`,
+                  ),
+                ),
+              GRAPH_SYNC_TIMEOUT_MS,
+            );
+          }),
+        ]);
       } catch (graphError) {
         const msg =
           graphError instanceof Error ? graphError.message : String(graphError);
@@ -135,8 +157,6 @@ export async function runFullSync(db: Db): Promise<SyncResult> {
       }
     }
 
-    const upserted = await embedAndUpsert(documents);
-    const deleted = await pruneOrphans(documents);
     const durationMs = Date.now() - started;
 
     console.log(

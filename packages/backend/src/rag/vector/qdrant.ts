@@ -7,17 +7,37 @@ const POINT_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
 let client: QdrantClient | null = null;
 
+/**
+ * @qdrant/js-client-rest defaults `port` to 6333 when URL has no explicit port.
+ * For HTTPS reverse proxies (Traefik/Cloudflare on 443), that causes connect timeouts.
+ * Pass `port: null` so the client uses the scheme default (443).
+ * See https://github.com/qdrant/qdrant-js/issues/59
+ */
+function buildQdrantClientOptions(url: string, apiKey?: string) {
+  const parsed = new URL(url);
+  const explicitPort = parsed.port !== "" ? Number(parsed.port) : undefined;
+  const fallbackPort = parsed.protocol === "https:" ? null : 6333;
+
+  return {
+    url,
+    port: explicitPort ?? fallbackPort,
+    // Remote / reverse-proxy often fails the version probe of js-client 1.18+
+    checkCompatibility: false,
+    ...(apiKey ? { apiKey } : {}),
+  };
+}
+
 export function getQdrantClient(): QdrantClient {
   if (!client) {
     if (!ragConfig.qdrantUrl) {
       throw new Error("QDRANT_URL is not set");
     }
-    client = new QdrantClient({
-      url: ragConfig.qdrantUrl,
-      ...(ragConfig.qdrantApiKey
-        ? { apiKey: ragConfig.qdrantApiKey }
-        : {}),
-    });
+    client = new QdrantClient(
+      buildQdrantClientOptions(
+        ragConfig.qdrantUrl,
+        ragConfig.qdrantApiKey || undefined,
+      ),
+    );
   }
   return client;
 }
@@ -254,11 +274,14 @@ export async function findHitsByNoteId(noteId: string): Promise<SearchHit[]> {
   return hits;
 }
 
-export async function pingQdrant(): Promise<boolean> {
+export type QdrantPingResult = { ok: boolean; error?: string };
+
+export async function pingQdrant(): Promise<QdrantPingResult> {
   try {
     await getQdrantClient().getCollections();
-    return true;
-  } catch {
-    return false;
+    return { ok: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { ok: false, error: message };
   }
 }

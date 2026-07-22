@@ -8,12 +8,7 @@ import { getMergedSyncStatus } from "../rag/sync/meta.js";
 import { getSyncStatus } from "../rag/sync/state.js";
 import { runFullSync } from "../rag/sync/indexer.js";
 import { pingQdrant } from "../rag/vector/qdrant.js";
-import {
-  body,
-  errors,
-  requireAdmin,
-  type AppEnv,
-} from "../lib/http.js";
+import { body, errors, requireAdmin, type AppEnv } from "../lib/http.js";
 
 export const ragRoutes = new Hono<AppEnv>();
 
@@ -36,11 +31,12 @@ ragRoutes.get("/health", async (c) => {
   if (!isRagConfigured()) {
     return c.json({ ok: false, configured: false }, 503);
   }
-  const [qdrant, neo4j] = await Promise.all([pingQdrant(), pingNeo4j()]);
+  const [qdrantPing, neo4j] = await Promise.all([pingQdrant(), pingNeo4j()]);
   return c.json({
-    ok: qdrant,
+    ok: qdrantPing.ok,
     configured: true,
-    qdrant,
+    qdrant: qdrantPing.ok,
+    qdrantError: qdrantPing.error ?? null,
     neo4j,
     graphConfigured: isGraphConfigured(),
   });

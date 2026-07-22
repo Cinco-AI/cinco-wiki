@@ -14,9 +14,7 @@ import { extractInternalNoteLinks } from "./links.js";
 import { getNeo4jDriver } from "./neo4j.js";
 import { ensureGraphSchema } from "./schema.js";
 
-async function upsertUsers(
-  users: GraphUser[],
-): Promise<void> {
+async function upsertUsers(users: GraphUser[]): Promise<void> {
   if (users.length === 0) return;
   const driver = getNeo4jDriver();
   const session = driver.session();
@@ -285,7 +283,11 @@ export async function upsertSocialGraph(
   console.log(
     `[rag] neo4j social upsert: notes=${notes.length} votes=${votes.length} comments=${comments.length}`,
   );
-  return { notes: notes.length, votes: votes.length, comments: comments.length };
+  return {
+    notes: notes.length,
+    votes: votes.length,
+    comments: comments.length,
+  };
 }
 
 /** Incremental: one published note + its votes/comments. */

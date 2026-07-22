@@ -7,10 +7,14 @@ export function getNeo4jDriver(): Driver {
   if (!isGraphConfigured()) {
     throw new Error("Neo4j is not configured (NEO4J_URI / USER / PASSWORD)");
   }
-  if (!driver) {
+    if (!driver) {
     driver = neo4j.driver(
       ragConfig.neo4jUri,
       neo4j.auth.basic(ragConfig.neo4jUser, ragConfig.neo4jPassword),
+      {
+        connectionTimeout: 5000,
+        connectionAcquisitionTimeout: 5000,
+      },
     );
   }
   return driver;
