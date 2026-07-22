@@ -15,6 +15,19 @@ type ChatMessage = {
   content: string;
 };
 
+/** Relative note path, or absolute URL whose path is a Mongo ObjectId note. */
+function noteInternalPath(href?: string): string | null {
+  if (!href) return null;
+  if (href.startsWith("/") && !href.startsWith("//")) return href;
+  try {
+    const path = new URL(href).pathname;
+    if (/^\/[a-f0-9]{24}$/i.test(path)) return path;
+  } catch {
+    /* ignore invalid URL */
+  }
+  return null;
+}
+
 function MarkdownLink({
   href,
   children,
@@ -22,10 +35,11 @@ function MarkdownLink({
   href?: string;
   children?: ReactNode;
 }) {
-  if (href && href.startsWith("/") && !href.startsWith("//")) {
+  const internal = noteInternalPath(href);
+  if (internal) {
     return (
       <Link
-        href={href}
+        href={internal}
         className="font-medium text-brand-600 underline-offset-2 hover:underline"
       >
         {children}

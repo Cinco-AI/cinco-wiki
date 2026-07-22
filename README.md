@@ -68,16 +68,14 @@ Détail des paramètres SSM créés :
 | `QDRANT_URL` | `/cinco-wiki/<stage>/QDRANT_URL` | String (optionnel — RAG) |
 | `QDRANT_API_KEY` | `/cinco-wiki/<stage>/QDRANT_API_KEY` | SecureString (optionnel) |
 | `QDRANT_COLLECTION` | `/cinco-wiki/<stage>/QDRANT_COLLECTION` | String (défaut `cinco_wiki`) |
+| `NEO4J_URI` | `/cinco-wiki/<stage>/NEO4J_URI` | String (optionnel — GraphRAG) |
+| `NEO4J_USER` | `/cinco-wiki/<stage>/NEO4J_USER` | String (défaut `neo4j`) |
+| `NEO4J_PASSWORD` | `/cinco-wiki/<stage>/NEO4J_PASSWORD` | SecureString (optionnel) |
 | `OPENAI_API_KEY` | `/cinco-wiki/<stage>/OPENAI_API_KEY` | SecureString (résumé liens + RAG) |
-
-Variables GraphRAG locales (`.env`, non poussées par défaut via SSM sauf si vous les ajoutez) :
-
-| Variable | Rôle |
-|---|---|
-| `NEO4J_URI` | Bolt local (`bolt://localhost:7687`) ou HTTPS Traefik (`https://neo4j.example.com`) |
-| `NEO4J_USER` / `NEO4J_PASSWORD` | Auth Neo4j |
-| `LLM_PROVIDER` | `openai` \| `openrouter` |
-| `EMBEDDING_MODEL` / `CHAT_MODEL` | Modèles embeddings / chat |
+| `OPENROUTER_API_KEY` | `/cinco-wiki/<stage>/OPENROUTER_API_KEY` | SecureString (si `LLM_PROVIDER=openrouter`) |
+| `LLM_PROVIDER` | `/cinco-wiki/<stage>/LLM_PROVIDER` | String (défaut `openai`) |
+| `CHAT_MODEL` / `EMBEDDING_MODEL` | `/cinco-wiki/<stage>/…` | String (optionnel) |
+| `PUBLIC_APP_URL` | `/cinco-wiki/<stage>/PUBLIC_APP_URL` | String (optionnel — base URL front pour liens chat) |
 
 `BUCKET_NAME` est dérivé automatiquement (`cinco-wiki-uploads-<stage>`) ;
 surchargeable via `--param="bucketName=..."`.

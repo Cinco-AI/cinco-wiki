@@ -27,6 +27,11 @@
 #   QDRANT_URL        (optionnel) -> String — URL HTTPS Qdrant (VPS)
 #   QDRANT_API_KEY    (optionnel) -> SecureString
 #   QDRANT_COLLECTION (optionnel) -> String — défaut cinco_wiki
+#   NEO4J_URI         (optionnel) -> String — bolt:// | neo4j+s:// | https://
+#   NEO4J_USER        (optionnel) -> String
+#   NEO4J_PASSWORD    (optionnel) -> SecureString
+#   OPENROUTER_API_KEY (optionnel) -> SecureString — si LLM_PROVIDER=openrouter
+#   PUBLIC_APP_URL    (optionnel) -> String — base URL front (liens assistant)
 #   LLM_PROVIDER      (optionnel) -> String — openai | openrouter
 #   CHAT_MODEL / EMBEDDING_MODEL (optionnel)
 set -euo pipefail
@@ -67,6 +72,11 @@ put OPENAI_API_KEY "${OPENAI_API_KEY:-}"       SecureString
 put QDRANT_URL     "${QDRANT_URL:-}"           String
 put QDRANT_API_KEY "${QDRANT_API_KEY:-}"       SecureString
 put QDRANT_COLLECTION "${QDRANT_COLLECTION:-cinco_wiki}" String
+put NEO4J_URI      "${NEO4J_URI:-}"            String
+put NEO4J_USER     "${NEO4J_USER:-neo4j}"      String
+put NEO4J_PASSWORD "${NEO4J_PASSWORD:-}"       SecureString
+put OPENROUTER_API_KEY "${OPENROUTER_API_KEY:-}" SecureString
+put PUBLIC_APP_URL "${PUBLIC_APP_URL:-}"       String
 put LLM_PROVIDER   "${LLM_PROVIDER:-openai}"   String
 put CHAT_MODEL     "${CHAT_MODEL:-gpt-4o-mini}" String
 put EMBEDDING_MODEL "${EMBEDDING_MODEL:-text-embedding-3-small}" String

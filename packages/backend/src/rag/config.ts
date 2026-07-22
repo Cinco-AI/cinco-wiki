@@ -4,6 +4,11 @@ export type LlmProvider = "openai" | "openrouter";
 
 const llmProvider = (process.env.LLM_PROVIDER || "openai") as LlmProvider;
 
+/** Trim and strip trailing slashes — used in assistant citation prompts. */
+export function normalizePublicAppUrl(raw: string): string {
+  return raw.trim().replace(/\/+$/, "");
+}
+
 export const ragConfig = {
   qdrantUrl: process.env.QDRANT_URL || "",
   qdrantApiKey: process.env.QDRANT_API_KEY || "",
@@ -11,6 +16,8 @@ export const ragConfig = {
   neo4jUri: process.env.NEO4J_URI || "",
   neo4jUser: process.env.NEO4J_USER || "neo4j",
   neo4jPassword: process.env.NEO4J_PASSWORD || "",
+  /** Frontend origin for note links in chat (e.g. https://cinco-wiki.netlify.app). */
+  publicAppUrl: normalizePublicAppUrl(process.env.PUBLIC_APP_URL || ""),
   llmProvider,
   openaiApiKey: process.env.OPENAI_API_KEY || "",
   openrouterApiKey: process.env.OPENROUTER_API_KEY || "",

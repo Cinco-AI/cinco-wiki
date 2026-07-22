@@ -9,9 +9,15 @@
 #   /cinco-wiki/<stage>/MONGODB_DB    (String, défaut "cinco-wiki")
 #   /cinco-wiki/<stage>/CORS_ORIGINS  (String, défaut "*")
 #   /cinco-wiki/<stage>/OPENAI_API_KEY (SecureString, optionnel — résumé de liens + RAG)
+#   /cinco-wiki/<stage>/OPENROUTER_API_KEY (SecureString, optionnel — si LLM_PROVIDER=openrouter)
 #   /cinco-wiki/<stage>/QDRANT_URL       (String, optionnel — URL Qdrant VPS)
 #   /cinco-wiki/<stage>/QDRANT_API_KEY   (SecureString, optionnel)
 #   /cinco-wiki/<stage>/QDRANT_COLLECTION (String, optionnel, défaut cinco_wiki)
+#   /cinco-wiki/<stage>/NEO4J_URI        (String, optionnel — bolt:// ou neo4j+s://)
+#   /cinco-wiki/<stage>/NEO4J_USER       (String, optionnel)
+#   /cinco-wiki/<stage>/NEO4J_PASSWORD   (SecureString, optionnel)
+#   /cinco-wiki/<stage>/LLM_PROVIDER / CHAT_MODEL / EMBEDDING_MODEL (String, optionnel)
+#   /cinco-wiki/<stage>/PUBLIC_APP_URL   (String, optionnel — base URL front pour liens chat)
 
 service: cinco-wiki
 
@@ -45,10 +51,15 @@ provider:
     QDRANT_URL: ${ssm:/cinco-wiki/${sls:stage}/QDRANT_URL, ''}
     QDRANT_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/QDRANT_API_KEY, ''}
     QDRANT_COLLECTION: ${ssm:/cinco-wiki/${sls:stage}/QDRANT_COLLECTION, 'cinco_wiki'}
+    NEO4J_URI: ${ssm:/cinco-wiki/${sls:stage}/NEO4J_URI, ''}
+    NEO4J_USER: ${ssm:/cinco-wiki/${sls:stage}/NEO4J_USER, 'neo4j'}
+    NEO4J_PASSWORD: ${ssm:/cinco-wiki/${sls:stage}/NEO4J_PASSWORD, ''}
     OPENAI_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/OPENAI_API_KEY, ''}
+    OPENROUTER_API_KEY: ${ssm:/cinco-wiki/${sls:stage}/OPENROUTER_API_KEY, ''}
     LLM_PROVIDER: ${ssm:/cinco-wiki/${sls:stage}/LLM_PROVIDER, 'openai'}
     CHAT_MODEL: ${ssm:/cinco-wiki/${sls:stage}/CHAT_MODEL, 'gpt-4o-mini'}
     EMBEDDING_MODEL: ${ssm:/cinco-wiki/${sls:stage}/EMBEDDING_MODEL, 'text-embedding-3-small'}
+    PUBLIC_APP_URL: ${ssm:/cinco-wiki/${sls:stage}/PUBLIC_APP_URL, ''}
   iam:
     role:
       statements:
