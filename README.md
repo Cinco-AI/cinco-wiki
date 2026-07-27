@@ -128,7 +128,7 @@ Déploiement Netlify : base `packages/frontend`, plugin `@netlify/plugin-nextjs`
 
 ## Assistant GraphRAG (optionnel)
 
-Chat sur les notes publiées via `/ask` (`POST /rag/chat`). Code dans
+Chat sur les notes publiées via `/ask` (`POST /rag/chat`). Code :
 `packages/backend/src/rag`.
 
 | Store | Rôle |
@@ -137,98 +137,28 @@ Chat sur les notes publiées via `/ask` (`POST /rag/chat`). Code dans
 | **Neo4j** | Graphe social : auteurs, tags, liens, votes, commentaires |
 
 Sans `QDRANT_URL` / clé LLM, l'assistant est désactivé — le reste du wiki fonctionne.
-Sans Neo4j (`NEO4J_*`), le chat vectoriel reste disponible ; les tools graphe sont no-op.
+Sans Neo4j (`NEO4J_*`), le chat vectoriel reste disponible ; les tools graphe sont soft-fail.
 
-### Démarrage local
+**Documentation reprise (sync, agent, deploy, tools, LLM, front↔back) :**
+[`docs/rag/README.md`](docs/rag/README.md).
+
+### Démarrage local (résumé)
 
 ```bash
 npm run qdrant:up
 # .env : QDRANT_URL, OPENAI_API_KEY, NEO4J_URI/USER/PASSWORD (+ MONGODB_URI, JWT_SECRET…)
-npm run rag:sync          # MongoDB → Qdrant + Neo4j
-npm run dev               # API backend
+npm run rag:sync
+npm run dev
 npm run frontend          # UI /ask
 ```
 
-Ports locaux (compose) :
-
-| Service | URL |
-|---------|-----|
-| Qdrant HTTP | http://localhost:6333 |
-| Neo4j Browser | http://localhost:7474 |
-| Neo4j Bolt | `bolt://localhost:7687` |
-
-> En local, ne laissez **pas** `QDRANT_API_KEY` défini avec une valeur vide si le
-> conteneur active l'auth : laissez la variable absente, ou alignez la clé côté client
-> et serveur.
-
-### Sync
-
-- **Full** : `npm run rag:sync` (notes publiées → embeddings Qdrant + graphe Neo4j).
-- **Incrémental notes** : create/update/unpublish → index Qdrant + structure graphe.
-- **Incrémental social** : votes / commentaires / réactions → arêtes Neo4j + stats payload Qdrant (sans re-embed).
-
 | Script | Action |
 |--------|--------|
-| `npm run qdrant:up` | Démarre Qdrant + Neo4j (Docker **dev**) |
-| `npm run qdrant:down` | Arrête la stack RAG dev |
-| `npm run rag:prod:up` | Démarre la stack **prod** (`docker-compose.rag.prod.yml` + `.env.rag.prod`) |
-| `npm run rag:prod:down` | Arrête la stack prod |
-| `npm run rag:sync` | Reindex complet (CLI, sans JWT) |
-| `npm run rag:sync -- --note-id <id>` | Sync d'une note publiée |
-| `npm run rag:sync -- --delete-note <id>` | Purge Qdrant (+ graphe) d'une note |
+| `npm run qdrant:up` / `qdrant:down` | Stack Docker **dev** |
+| `npm run rag:prod:up` / `rag:prod:down` | Stack Docker **prod** |
+| `npm run rag:sync` | Reindex complet (CLI) |
 
-### Déploiement VPS (modèle prod)
-
-Même services que le compose dev ; seuls 3 secrets dans `.env.rag.prod` :
-
-```bash
-cp .env.rag.prod.example .env.rag.prod
-# QDRANT_API_KEY / NEO4J_USER / NEO4J_PASSWORD
-npm run rag:prod:up
-```
-
-Ports bindés sur `127.0.0.1` uniquement. TLS (Nginx/Caddy/Traefik) → Qdrant `:6333` si besoin.
-Fichier : [`docker-compose.rag.prod.yml`](docker-compose.rag.prod.yml).
-
-> **`QDRANT_URL` derrière un reverse proxy HTTPS** : utiliser
-> `https://qdrant.example.com` **sans** `:6333`. Le client JS (`@qdrant/js-client-rest`)
-> retombe sinon sur le port 6333 (non exposé publiquement) au lieu de 443.
-> En local : garder `http://localhost:6333`.
-
-> **`NEO4J_URI`** :
-> - Local / Docker : `bolt://localhost:7687` (driver Bolt).
-> - Derrière Traefik/HTTPS (API HTTP Neo4j, port 7474) :
->   `https://neo4j.example.com` — le backend appelle `/db/neo4j/tx/commit`.
->   Ne pas utiliser `https://` avec le driver Bolt seul (`Unknown scheme: https`).
->   Bolt (`:7687`) n’est en général **pas** exposé via Traefik HTTP.
-
-### Outils agent & MCP
-
-L'agent (`POST /rag/chat`) et le serveur MCP HTTP (auth JWT, préfixe `/rag`) partagent
-les mêmes tools (`packages/backend/src/rag/catalog/tools.ts`) :
-
-| Intention | Tool |
-|-----------|------|
-| Contenu / sens | `searchNotes`, `getNote` |
-| Filtres structurés (date, YouTube, tris) | `findNotes` (`sinceDays`, `linkHost`, `sort`, `limit`) |
-| Tags | `listTags` |
-| Contributeurs | `topContributors` |
-| Liens / tags partagés | `relatedNotes`, `notesBySharedTags`, `graphPath` |
-| Classements graphe | `topRatedNotes`, `mostCommentedNotes` (ou `findNotes` + `sort`) |
-| Auteurs | `notesByAuthor`, `authorsByTag` |
-| Votes | `noteRatings`, `notesRatedByUser` |
-| Commentaires | `noteComments`, `notesCommentedByUser` |
-
-Endpoints MCP :
-
-```
-GET  /rag/mcp
-GET  /rag/mcp/tools
-POST /rag/mcp/tools/:name
-POST /rag/mcp                 # JSON-RPC : initialize | tools/list | tools/call
-```
-
-Health : `GET /rag/health` → `{ qdrant, neo4j, graphConfigured }`.
+Health : `GET /rag/health` (JWT) → `{ qdrant, neo4j, graphConfigured }`.
 
 ## Amorçage du premier admin
 
